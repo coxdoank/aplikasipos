@@ -11,6 +11,9 @@ import { CheckoutPage } from "@/modules/public-store/pages/CheckoutPage";
 import { OrderConfirmationPage } from "@/modules/public-store/pages/OrderConfirmationPage";
 import { TrackOrderPage } from "@/modules/public-store/pages/TrackOrderPage";
 
+// Auth Pages
+import { LoginPage } from "@/modules/auth/pages/LoginPage";
+
 // Backoffice Pages
 import { DashboardPage } from "@/modules/dashboard/pages/DashboardPage";
 import { PosPage } from "@/modules/pos/pages/PosPage";
@@ -21,7 +24,8 @@ import { InventoryPage } from "@/modules/inventory/pages/InventoryPage";
 import { ReportsPage } from "@/modules/reports/pages/ReportsPage";
 import { SettingsPage } from "@/modules/settings/pages/SettingsPage";
 
-// Shared Pages
+// Security & Shared Components
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { NotFoundPage } from "@/components/shared/NotFoundPage";
 
 export const AppRouter: React.FC = () => {
@@ -38,16 +42,75 @@ export const AppRouter: React.FC = () => {
           <Route path="track" element={<TrackOrderPage />} />
         </Route>
 
-        {/* Backoffice Internal Routes */}
-        <Route path="/backoffice" element={<BackofficeLayout />}>
+        {/* Backoffice Unauthenticated Login Route */}
+        <Route path="/backoffice/login" element={<LoginPage />} />
+
+        {/* Protected Backoffice Routes */}
+        <Route
+          path="/backoffice"
+          element={
+            <ProtectedRoute>
+              <BackofficeLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
-          <Route path="pos" element={<PosPage />} />
-          <Route path="orders" element={<OrdersPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="categories" element={<CategoriesPage />} />
-          <Route path="inventory" element={<InventoryPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route
+            path="pos"
+            element={
+              <ProtectedRoute requiredPermission="orders.create">
+                <PosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <ProtectedRoute requiredPermission="orders.view">
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="products"
+            element={
+              <ProtectedRoute requiredPermission="products.view">
+                <ProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="categories"
+            element={
+              <ProtectedRoute requiredPermission="products.manage">
+                <CategoriesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="inventory"
+            element={
+              <ProtectedRoute requiredPermission="inventory.adjust">
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <ProtectedRoute requiredPermission="reports.view">
+                <ReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute requiredPermission="settings.manage">
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* 404 Route */}

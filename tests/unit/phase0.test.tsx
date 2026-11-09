@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
 import App from "@/App";
+import { useAuthStore } from "@/stores/authStore";
 
 describe("PHASE 0 — Project Foundation and Routing Verification", () => {
   it("renders Public Layout with brand header and navigation", () => {
@@ -18,13 +19,20 @@ describe("PHASE 0 — Project Foundation and Routing Verification", () => {
     expect(screen.getAllByText("Lacak Pesanan").length).toBeGreaterThan(0);
   });
 
-  it("renders Backoffice Layout when navigating to hash #/backoffice", () => {
+  it("renders Backoffice Layout when authenticated and navigating to hash #/backoffice", () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      role: "OWNER",
+      profile: { id: "u-1", fullName: "Owner Resto", email: "owner@foodpos.local" },
+      outlet: { id: "o-1", code: "OUT-01", name: "Outlet Pusat" },
+      permissions: ["orders.view", "orders.create"],
+    });
+
     window.location.hash = "#/backoffice";
     render(<App />);
 
-    // Check backoffice dashboard title
-    expect(screen.getByText(/Ringkasan Operasional Restoran/i)).toBeInTheDocument();
-    expect(screen.getByText(/Buka Layar Kasir/i)).toBeInTheDocument();
+    // Check backoffice dashboard title or welcome banner
+    expect(screen.getByText(/Selamat Datang, Owner Resto/i)).toBeInTheDocument();
   });
 
   it("renders 404 page when navigating to an unknown route", () => {

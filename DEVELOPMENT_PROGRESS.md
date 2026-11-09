@@ -1,90 +1,75 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 2 — Public Website
+## Current Phase: PHASE 3 — Backoffice Foundation and Authentication
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 2)
-- [x] **State Management Keranjang Publik (Zustand Cart Store):**
-  - Implementasi `src/stores/cartStore.ts` dengan persistensi `localStorage`.
-  - Dukungan composite item ID (`productId_variantId_addonIds`).
-  - Penambahan item, pembaruan kuantitas (+ / -), penghapusan item individual, pengosongan keranjang dengan dialog konfirmasi.
-  - Perhitungan subtotal, estimasi pajak restoran (PB1 10%), dan jumlah item aktif secara realtime.
-- [x] **Layanan Data Publik & Enkripsi Token (Store Service):**
-  - Implementasi `src/services/storeService.ts`.
-  - Generator token acak berentropi tinggi 256-bit (CSPRNG 32 byte) dengan format `trk_<hex64>`.
-  - Fungsi hashing SHA-256 via Web Crypto API (`crypto.subtle.digest`) untuk menjamin token disimpan dalam bentuk hash satu arah di database.
-  - Fallback data katalog & simulator pesanan lokal yang cepat saat lingkungan Supabase remote belum tersinkronisasi.
-- [x] **Modal Kustomisasi Produk (`ProductDetailModal`):**
-  - Modal interaktif pemilihan varian menu (radio button dengan penyesuaian harga).
-  - Pilihan topping / add-ons (checkbox multi-select dengan harga masing-masing).
-  - Kontrol jumlah porsi (+ / -) dengan proteksi batas stok fisik.
-  - Catatan khusus per menu untuk instruksi dapur.
-  - Perhitungan harga total dinamis pada tombol aksi.
-- [x] **Halaman Katalog Menu Interaktif (`MenuPage`):**
-  - Kategori menu pills dengan indikator jumlah menu.
-  - Filter pencarian teks realtime pada nama dan deskripsi menu.
-  - Kartu produk modern dengan status ketersediaan stok, badge porsi tersisa, dan tombol pemesanan langsung.
-- [x] **Halaman Keranjang Belanja (`CartPage`):**
-  - Daftar item pesanan dengan rincian varian, topping terpilih, dan catatan dapur.
-  - Kontrol kuantitas porsi langsung di keranjang.
-  - Ringkasan tagihan kotor, kalkulasi pajak restoran 10%, dan navigasi ke checkout.
-  - Tampilan *empty state* informatif.
-- [x] **Halaman Checkout Pesanan (`CheckoutPage`):**
-  - Validasi form data pelanggan (Nama Lengkap dan Nomor WhatsApp valid).
-  - Pilihan opsi layanan: Dine-in, Takeaway, Delivery (ongkir flat Rp 10.000 dengan input alamat wajib), Pickup.
-  - Pilihan metode pembayaran: QRIS Statis, Transfer Bank BCA, Tunai, Kartu Debit/EDC.
-  - Catatan instruksi pengantaran / pesanan.
-  - Pencegahan pengiriman ganda (*submitting loader*).
-- [x] **Halaman Konfirmasi Pesanan (`OrderConfirmationPage`):**
-  - Menampilkan Nomor Pesanan unik (contoh: `ORD-20261109-XXXX`).
-  - Menampilkan rincian status pesanan (`NEW`) dan status pembayaran.
-  - Petunjuk pembayaran khusus per metode (tampilan QRIS statis, nomor rekening BCA & atas nama, instruksi tunai).
-  - Kotak Token Akses Pelacakan Rahasia 256-bit dengan tombol salin satu-klik dan tombol langsung lacak pesanan.
-- [x] **Halaman Pelacakan Pesanan Aman (`TrackOrderPage`):**
-  - Pencarian status menggunakan token acak atau membaca otomatis dari URL parameter `?token=...`.
-  - Stepper visual progres pesanan: NEW -> PROCESSING -> READY -> COMPLETED.
-  - Rincian snapshot menu yang dipesan, total tagihan, riwayat timestamp transisi, dan kontak bantuan WhatsApp.
-- [x] **Halaman Beranda (`HomePage`):**
-  - Hero banner promosi, banner diskon 15% pesanan online, nilai keunggulan restoran, teaser menu terpopuler terhubung ke modal pemesanan, arsitektur ulasan pelanggan, jam operasional, peta Google Maps, dan kontak WhatsApp.
-- [x] **Router & Navigasi Publik (`AppRouter`, `PublicLayout`):**
-  - Pendaftaran rute `/order-confirmation`.
-  - Indikator badge keranjang realtime pada navbar publik.
-- [x] **Migrasi Server-Side RPC (`20261109000013_create_online_order_rpc.sql`):**
-  - Prosedur `create_online_order` dengan rekalkulasi harga dari database, verifikasi stok, pemotongan stok otomatis, pencatatan `stock_movements`, dan penyimpanan hash token.
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 3)
+- [x] **State Management Autentikasi Staf (`src/stores/authStore.ts`):**
+  - Session persistence dengan `localStorage`.
+  - Penyimpanan status login (`isAuthenticated`), identitas user, profil staf (`StaffProfile`), peran aktif (`OWNER` | `ADMIN` | `CASHIER`), hak akses (`permissions: string[]`), dan data cabang (`outlet`).
+  - Method `hasPermission(code)` yang mengizinkan role `OWNER` secara otomatis (*super admin*) dan memeriksa izin staf lain.
+  - Method `hasRole(name)` untuk verifikasi peran.
+  - Logout bersih yang menghapus seluruh kredensial lokal dan sesi Supabase.
+- [x] **Layanan Autentikasi (`src/services/authService.ts`):**
+  - Integrasi dengan Supabase Auth `signInWithPassword`.
+  - Pengambilan data profil dari tabel `profiles`.
+  - Pengambilan role dari tabel `user_roles` dan permissions dari tabel `role_permissions`.
+  - Penyediaan akun demo staf (Owner, Admin, Kasir) untuk kemudahan pengujian di lingkungan simulasi offline.
+- [x] **Halaman Masuk Backoffice (`src/modules/auth/pages/LoginPage.tsx`):**
+  - Antarmuka login kasir/staf modern dan profesional.
+  - Form email & kata sandi dengan toggle lihat/sembunyikan password.
+  - Tombol akses cepat demo staf (Owner, Admin, Kasir) dengan kredensial simulator siap uji.
+  - Catatan keamanan: Penjelasan pendaftaran Owner yang terlindungi tanpa registrasi publik.
+- [x] **Sistem Proteksi Rute & Wewenang (`ProtectedRoute.tsx` & `AccessDeniedPage.tsx`):**
+  - Pengalihan otomatis (*redirect*) pengguna yang belum login ke rute `#/backoffice/login` dengan preserving `location.state.from`.
+  - Komponen halaman **403 Forbidden** yang informatif menampilkan staf login, peran aktif, dan kode izin yang dibutuhkan.
+  - Proteksi rute modular:
+    - `/backoffice/pos` memerlukan izin `orders.create`.
+    - `/backoffice/orders` memerlukan izin `orders.view`.
+    - `/backoffice/products` memerlukan izin `products.view`.
+    - `/backoffice/categories` memerlukan izin `products.manage`.
+    - `/backoffice/inventory` memerlukan izin `inventory.adjust`.
+    - `/backoffice/reports` memerlukan izin `reports.view`.
+    - `/backoffice/settings` memerlukan izin `settings.manage`.
+- [x] **Layout Backoffice Dinamis (`BackofficeLayout.tsx`):**
+  - Penyaringan menu navigasi sidebar secara dinamis berdasarkan wewenang aktif pengguna.
+  - Tampilan nama staf, badge peran (`OWNER`, `ADMIN`, `CASHIER`), dan outlet pada sidebar & topbar.
+  - Tombol logout dengan konfirmasi pengguna di sidebar bawah dan topbar.
+- [x] **Dashboard Backoffice Terintegrasi (`DashboardPage.tsx`):**
+  - Sambutan personal dengan nama dan peran staf.
+  - Kartu KPI pendapatan, total pesanan, rata-rata waktu masak, dan peringatan stok.
+  - Status sesi shift kasir dengan tombol aksi cepat buka/tutup shift.
+  - Antrian pesanan berjalan terkini.
 - [x] **Pengujian & Kualitas:**
-  - 17 unit tests passed (3 Phase 0, 5 Phase 1, 9 Phase 2).
+  - 23 unit & integration tests passed across 5 test suites.
   - ESLint 0 errors, 0 warnings.
   - Kompilasi produksi TypeScript & Vite sukses.
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 2. Seluruh modul website publik telah selesai dan teruji.
+- Tidak ada untuk Phase 3. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/stores/cartStore.ts`
-- `src/services/storeService.ts`
-- `src/modules/public-store/components/ProductDetailModal.tsx`
-- `src/modules/public-store/pages/OrderConfirmationPage.tsx`
-- `supabase/migrations/20261109000013_create_online_order_rpc.sql`
-- `tests/unit/phase2_public_website.test.tsx`
-- `tests/unit/phase2_ui_integration.test.tsx`
+- `src/services/authService.ts`
+- `src/stores/authStore.ts`
+- `src/components/shared/ProtectedRoute.tsx`
+- `src/components/shared/AccessDeniedPage.tsx`
+- `src/modules/auth/pages/LoginPage.tsx`
+- `tests/unit/phase3_auth_backoffice.test.tsx`
 
 #### Dimodifikasi:
-- `src/layouts/public/PublicLayout.tsx`
 - `src/app/router/index.tsx`
-- `src/modules/public-store/pages/HomePage.tsx`
-- `src/modules/public-store/pages/MenuPage.tsx`
-- `src/modules/public-store/pages/CartPage.tsx`
-- `src/modules/public-store/pages/CheckoutPage.tsx`
-- `src/modules/public-store/pages/TrackOrderPage.tsx`
+- `src/layouts/backoffice/BackofficeLayout.tsx`
+- `src/modules/dashboard/pages/DashboardPage.tsx`
+- `tests/unit/phase0.test.tsx`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -97,28 +82,30 @@
   - `tests/unit/phase1_database.test.ts` (5 passed)
   - `tests/unit/phase2_public_website.test.tsx` (5 passed)
   - `tests/unit/phase2_ui_integration.test.tsx` (4 passed)
-  - Total: **17 passed, 0 failed**.
+  - `tests/unit/phase3_auth_backoffice.test.tsx` (6 passed)
+  - Total: **23 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-DmvMJVQ4.js` (584.88 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-B4nhuPuP.js` (602.58 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada error atau issue tersisa pada Phase 2.
+- Tidak ada error tersisa pada Phase 3.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 3 — Backoffice Foundation and Authentication**
-  - Implementasi login staf (Owner, Admin, Kasir) via Supabase Auth.
-  - Session management & route protection (mencegah akses tanpa login).
-  - Role & Permission checker hooks (`useAuthStore`, `usePermission`).
-  - Profil staf & manajemen hak akses backoffice.
-  - Dashboard eksekutif foundation dengan metrik penjualan, order berjalan, dan status shift kasir.
+- **PHASE 4 — Order Management and Kanban**
+  - Implementasi Order List dengan pencarian, filter channel, dan filter status.
+  - Implementasi Order Kanban board (NEW -> PROCESSING -> READY -> COMPLETED).
+  - Implementasi transisi status pesanan dengan validasi alur transisi server-side (`order_status_history`).
+  - Implementasi pembatalan pesanan (Cancellation dialog dengan alasan wajib).
+  - Modal rincian pesanan (Order Details snapshot).
+  - Audio / visual notification saat pesanan baru masuk.
 
 ---
 
 ### 7. Approval Status
-- **Phase 2 Status:** SELESAI (Pending user confirmation: **Lanjut**).
+- **Phase 3 Status:** SELESAI (Pending user confirmation: **Lanjut**).

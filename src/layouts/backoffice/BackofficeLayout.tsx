@@ -9,25 +9,33 @@ import {
   Package,
   FileBarChart,
   Settings,
-  Bell,
   Menu,
   X,
   Store,
   ChevronRight,
   LogOut,
   User,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/authStore";
 
-const menuItems = [
+interface NavMenuItem {
+  label: string;
+  path: string;
+  icon: React.ComponentType<{ className?: string }>;
+  requiredPermission?: string;
+}
+
+const allMenuItems: NavMenuItem[] = [
   { label: "Dashboard", path: "/backoffice", icon: LayoutDashboard },
-  { label: "POS / Kasir", path: "/backoffice/pos", icon: ShoppingCart },
-  { label: "Manajemen Pesanan", path: "/backoffice/orders", icon: Receipt },
-  { label: "Produk & Menu", path: "/backoffice/products", icon: Utensils },
-  { label: "Kategori", path: "/backoffice/categories", icon: Layers },
-  { label: "Stok & Inventori", path: "/backoffice/inventory", icon: Package },
-  { label: "Laporan Keuangan", path: "/backoffice/reports", icon: FileBarChart },
-  { label: "Pengaturan Toko", path: "/backoffice/settings", icon: Settings },
+  { label: "POS / Kasir", path: "/backoffice/pos", icon: ShoppingCart, requiredPermission: "orders.create" },
+  { label: "Manajemen Pesanan", path: "/backoffice/orders", icon: Receipt, requiredPermission: "orders.view" },
+  { label: "Produk & Menu", path: "/backoffice/products", icon: Utensils, requiredPermission: "products.view" },
+  { label: "Kategori", path: "/backoffice/categories", icon: Layers, requiredPermission: "products.manage" },
+  { label: "Stok & Inventori", path: "/backoffice/inventory", icon: Package, requiredPermission: "inventory.adjust" },
+  { label: "Laporan Keuangan", path: "/backoffice/reports", icon: FileBarChart, requiredPermission: "reports.view" },
+  { label: "Pengaturan Toko", path: "/backoffice/settings", icon: Settings, requiredPermission: "settings.manage" },
 ];
 
 export const BackofficeLayout: React.FC = () => {
@@ -35,11 +43,26 @@ export const BackofficeLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { profile, role, outlet, logout, hasPermission } = useAuthStore();
+
+  // Filter menu items by user permissions
+  const authorizedMenuItems = allMenuItems.filter((item) => {
+    if (!item.requiredPermission) return true;
+    return hasPermission(item.requiredPermission);
+  });
+
   // Determine current active page label for breadcrumb
-  const currentItem = menuItems.find((item) => 
-    item.path === location.pathname || 
+  const currentItem = allMenuItems.find((item) =>
+    item.path === location.pathname ||
     (item.path !== "/backoffice" && location.pathname.startsWith(item.path))
   );
+
+  const handleLogout = async () => {
+    if (window.confirm("Apakah Anda yakin ingin keluar dari sistem Backoffice?")) {
+      await logout();
+      navigate("/backoffice/login", { replace: true });
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-muted/20 text-foreground">
@@ -75,18 +98,19 @@ export const BackofficeLayout: React.FC = () => {
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-muted-foreground hover:text-foreground"
+            aria-label="Tutup menu"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 py-4 px-3 overflow-y-auto">
+        <div className="flex-1 py-4 px-3 overflow-y-auto space-y-1">
           <p className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Menu Operasional
           </p>
           <nav className="space-y-1">
-            {menuItems.map((item) => {
+            {authorizedMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive =
                 item.path === "/backoffice"
@@ -113,20 +137,34 @@ export const BackofficeLayout: React.FC = () => {
         </div>
 
         {/* User Profile & Store Info at Bottom */}
-        <div className="p-4 border-t bg-card/60">
+        <div className="p-4 border-t bg-card/60 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+            <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
               <User className="h-4 w-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">Kasir / Administrator</p>
-              <p className="text-xs text-muted-foreground truncate">Outlet Pusat (ID-01)</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-bold truncate text-foreground">
+                  {profile?.fullName || "Staf Restoran"}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary/15 text-primary">
+                  {role || "STAF"}
+                </span>
+                <span className="text-[10px] text-muted-foreground truncate">
+                  • {outlet?.name || "Outlet Pusat"}
+                </span>
+              </div>
             </div>
-            <Link to="/">
-              <Button variant="ghost" size="icon" title="Kembali ke Web Publik">
-                <LogOut className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-              </Button>
-            </Link>
+            <button
+              onClick={handleLogout}
+              className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              title="Keluar dari Backoffice"
+              aria-label="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </aside>
@@ -139,6 +177,7 @@ export const BackofficeLayout: React.FC = () => {
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
+              aria-label="Buka menu"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -164,17 +203,35 @@ export const BackofficeLayout: React.FC = () => {
               </Button>
             </Link>
 
-            <Link to="/backoffice/pos">
-              <Button variant="default" size="sm" className="text-xs gap-1.5 font-semibold">
-                <ShoppingCart className="h-3.5 w-3.5" />
-                Buka Kasir POS
-              </Button>
-            </Link>
+            {hasPermission("orders.create") && (
+              <Link to="/backoffice/pos">
+                <Button variant="default" size="sm" className="text-xs gap-1.5 font-semibold">
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  Buka Kasir POS
+                </Button>
+              </Link>
+            )}
 
-            <Button variant="ghost" size="icon" className="relative text-muted-foreground">
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse" />
-            </Button>
+            <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
+
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex flex-col text-right">
+                <span className="text-xs font-bold leading-tight">{profile?.fullName}</span>
+                <span className="text-[10px] text-muted-foreground uppercase flex items-center justify-end gap-1">
+                  <Shield className="h-2.5 w-2.5 text-primary" /> {role}
+                </span>
+              </div>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                className="text-muted-foreground hover:text-destructive"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </header>
 
