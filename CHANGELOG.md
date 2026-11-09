@@ -7,7 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.0] - 2026-11-09
+## [0.5.0] - 2026-11-09
+### Phase 4 — Order Management and Kanban
+
+#### Added
+- **Order Service Layer (`src/services/orderService.ts`):**
+  - Mesin status pesanan ketat (*Finite State Machine*): `NEW` -> `PROCESSING` -> `READY` -> `COMPLETED`.
+  - Pembatalan pesanan terotorisasi (`orders.cancel`) dari setiap status non-terminal dengan alasan wajib.
+  - Audit trail perubahan status tersimpan di `order_status_history` dengan catatan operator dan waktu.
+  - Generator notifikasi audio dapur (*Kitchen Chime*) berbasis Web Audio API tanpa berkas eksternal.
+  - Sinkronisasi otomatis pesanan baru dari pemesanan online publik ke antrean backoffice.
+- **Papan Kanban Pesanan (`OrderKanban.tsx`):**
+  - 4 kolom antrean status: Pesanan Baru, Sedang Dimasak, Siap Saji/Kirim, dan Selesai.
+  - Drag-and-drop antar kolom dan tombol aksi cepat 1-klik untuk operasional tablet/layar sentuh.
+  - Kartu pesanan lengkap dengan nomor order, saluran, tipe layanan, waktu tunggu urgensi, dan total harga.
+- **Tampilan Tabel Pesanan Responsif (`OrdersPage.tsx`):**
+  - Switcher mode Kanban vs Tabel responsif.
+  - Kartu ringkasan KPI dan filter cepat status pesanan.
+  - Filter saluran (Online/POS), jenis layanan (Dine-in, Takeaway, Delivery, Pickup), dan urutan waktu.
+  - Fitur *live polling* berkala untuk mendeteksi pesanan online baru dengan *kitchen chime* dan toast alert.
+- **Modal Detail Pesanan Komprehensif (`OrderDetailModal.tsx`):**
+  - Snapshot informasi pelanggan, tautan WhatsApp langsung, dan alamat pengantaran.
+  - Rincian menu hidangan, varian, topping add-on, dan instruksi khusus per item.
+  - Rincian finansial (subtotal, PB1 10%, ongkir, grand total) dan detail pembayaran (metode, TRX ref, status).
+  - Stepper visual riwayat perjalanan status pesanan.
+- **Dialog Pembatalan Pesanan (`CancelOrderDialog.tsx`):**
+  - Validasi izin pembatalan (`orders.cancel`), preset alasan pembatalan, dan input alasan spesifik.
+- **Modal Cetak Struk Kasir Termal (`ReceiptPrintModal.tsx`):**
+  - Format struk restoran termal 58mm/80mm siap cetak (`window.print()`).
+- **Pengujian Unit & Integrasi Phase 4 (`tests/unit/phase4_orders.test.tsx`):**
+  - 15 pengujian menyeluruh untuk validasi transisi FSM, pembatalan, permission guard, dan rendering UI.
+
+---
+
+## [0.4.0] - 2026-11-09
+### Phase 3 — Backoffice Foundation and Authentication
+
+#### Added
+- **State Management Autentikasi Staf (`src/stores/authStore.ts`):**
+  - Zustand auth store dengan sesi persistence di `localStorage`.
+  - Dukungan peran staf (`OWNER`, `ADMIN`, `CASHIER`), hak akses granular, dan outlet aktif.
+- **Layanan Autentikasi (`src/services/authService.ts`):**
+  - Dukungan Supabase Auth dan simulator akun demo staf (Owner, Admin, Kasir).
+- **Halaman Masuk Backoffice (`LoginPage.tsx`):**
+  - Login form profesional dengan tombol akses cepat akun demo staf.
+- **Proteksi Rute RBAC (`ProtectedRoute.tsx` & `AccessDeniedPage.tsx`):**
+  - Otentikasi dan pengecekan hak akses granular dengan halaman 403 Forbidden informatif.
+- **Layout Backoffice Dinamis (`BackofficeLayout.tsx`):**
+  - Sidebar dinamis tersaring berdasarkan wewenang aktif pengguna, identitas staf, dan konfirmasi logout.
+- **Dashboard Backoffice (`DashboardPage.tsx`):**
+  - Kartu ringkasan KPI, kontrol sesi shift kasir, dan antrean pesanan aktif.
+- **Pengujian Unit Phase 3 (`tests/unit/phase3_auth_backoffice.test.tsx`):**
+  - 6 unit test untuk login flow, proteksi rute, dan permission filtering.
+
+---
 ### Phase 2 — Public Website
 
 #### Added

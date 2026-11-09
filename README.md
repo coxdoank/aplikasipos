@@ -78,6 +78,15 @@ FOODPOS/
 
 ---
 
+## 📚 Status Pengembangan & Fitur Selesai
+- **Phase 0:** Fondasi project React 18, TypeScript, Vite, Tailwind CSS, shadcn design tokens, HashRouter.
+- **Phase 1:** Fondasi Database Supabase PostgreSQL 28 tabel, 12 migrasi SQL, RLS komprehensif, multi-outlet, dan Owner bootstrap.
+- **Phase 2:** Website Publik (Katalog Menu, Keranjang Zustand, Checkout dengan PB1 & Delivery, Token Pelacakan CSPRNG 256-bit, Stepper Status).
+- **Phase 3:** Backoffice & Autentikasi RBAC (Zustand Auth Store, Proteksi Rute `ProtectedRoute`, 403 Forbidden, Demo Staff accounts, Dashboard KPI).
+- **Phase 4:** Manajemen Pesanan & Kanban (Papan Kanban Drag-and-Drop, FSM Status Mesin, Riwayat Audit Perjalanan Status, Notifikasi Audio Chime Web Audio API, Modal Detail Pesanan Komprehensif, Dialog Pembatalan Aman, Pratinjau Cetak Struk Kasir Termal 58/80mm).
+
+---
+
 ## 🚀 Panduan Instalasi & Pengembangan Lokal
 
 ### 1. Prasyarat

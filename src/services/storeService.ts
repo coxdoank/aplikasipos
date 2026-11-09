@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { CartItem } from "@/stores/cartStore";
+import { orderService } from "@/services/orderService";
 
 export interface PublicCategory {
   id: string;
@@ -456,6 +457,62 @@ export const storeService = {
     };
 
     LOCAL_MOCK_ORDERS[tokenHash] = trackingData;
+
+    // Register with Backoffice Orders System
+    orderService.registerOnlineOrder({
+      id: `ord-online-${Date.now()}`,
+      outlet_id: "e0000000-0000-0000-0000-000000000001",
+      order_number: orderNumber,
+      channel: "ONLINE",
+      service_type: payload.serviceType,
+      order_status: "NEW",
+      customer_name_snapshot: payload.customerName,
+      customer_phone_snapshot: payload.customerPhone,
+      delivery_address_snapshot: payload.deliveryAddress || null,
+      subtotal,
+      discount_amount: 0,
+      tax_amount: tax,
+      service_charge_amount: 0,
+      delivery_fee: deliveryFee,
+      grand_total: grandTotal,
+      notes: payload.notes || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      items: payload.items.map((i, idx) => ({
+        id: `item-${Date.now()}-${idx}`,
+        order_id: `ord-online-${Date.now()}`,
+        product_id: i.productId,
+        product_name_snapshot: i.name,
+        sku_snapshot: `SKU-${i.productId.slice(0, 4)}`,
+        variant_name_snapshot: i.variant?.name || null,
+        addons_snapshot: i.addons.map((a) => ({ id: a.id, name: a.name, price: a.price })),
+        unit_price: i.unitPrice,
+        quantity: i.quantity,
+        discount_amount: 0,
+        line_total: i.unitPrice * i.quantity,
+        item_notes: i.itemNotes || null,
+      })),
+      history: [
+        {
+          id: `h-${Date.now()}`,
+          order_id: `ord-online-${Date.now()}`,
+          previous_status: null,
+          new_status: "NEW",
+          actor_name: "Pelanggan Online Web",
+          reason: "Pesanan online masuk via web",
+          created_at: new Date().toISOString(),
+        },
+      ],
+      payment: {
+        id: `pay-${Date.now()}`,
+        order_id: `ord-online-${Date.now()}`,
+        payment_method: payload.paymentMethod,
+        status: payload.paymentMethod === "CASH" ? "PENDING" : "PAID",
+        amount: grandTotal,
+        reference_number: `REF-${Date.now().toString().slice(-6)}`,
+        created_at: new Date().toISOString(),
+      },
+    });
 
     return {
       success: true,

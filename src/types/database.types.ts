@@ -377,6 +377,61 @@ export interface Database {
           created_at?: string;
         };
       };
+      order_status_history: {
+        Row: {
+          id: string;
+          order_id: string;
+          previous_status: OrderStatus | null;
+          new_status: OrderStatus;
+          actor_id: string | null;
+          actor_name: string | null;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          previous_status?: OrderStatus | null;
+          new_status: OrderStatus;
+          actor_id?: string | null;
+          actor_name?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          order_id?: string;
+          previous_status?: OrderStatus | null;
+          new_status?: OrderStatus;
+          actor_id?: string | null;
+          actor_name?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+      };
+      public_order_tokens: {
+        Row: {
+          id: string;
+          order_id: string;
+          token_hash: string;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          token_hash: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          order_id?: string;
+          token_hash?: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+      };
       order_payments: {
         Row: {
           id: string;
