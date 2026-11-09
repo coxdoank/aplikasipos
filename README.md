@@ -1,0 +1,126 @@
+# FOODPOS — Integrated Point of Sale & Restaurant Management System
+
+FOODPOS adalah sistem Point of Sale (POS) dan manajemen operasional restoran modern berbasis **Modular Monolithic Single Page Application (SPA)**. Dirancang untuk kecepatan transaksi kasir, keteraturan alur dapur, pelacakan pesanan publik yang aman, serta integrasi manajemen keuangan dan inventori produk siap saji.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend Core:** React 18, TypeScript, Vite
+- **Styling & UI:** Tailwind CSS, shadcn/ui design tokens, Lucide React
+- **Routing:** React Router v6 (`HashRouter` untuk kompatibilitas GitHub Pages)
+- **State Management:** Zustand, TanStack Query (React Query)
+- **Forms & Validation:** React Hook Form, Zod
+- **Visuals & Charts:** Recharts
+- **Interactions:** dnd-kit
+- **Testing:** Vitest, React Testing Library, JSDOM
+- **Backend & Database:** Supabase (PostgreSQL, Row Level Security, Storage, Edge Functions)
+
+---
+
+## 📂 Struktur Project
+
+```
+FOODPOS/
+├── public/                 # Static assets
+├── src/
+│   ├── app/                # Router, providers, configuration
+│   ├── components/         # Shared & UI components (shadcn/ui style)
+│   ├── layouts/            # Public & Backoffice layouts
+│   ├── modules/            # Domain-driven feature modules
+│   │   ├── auth/           # Login & session management
+│   │   ├── dashboard/      # Executive KPIs & real-time monitor
+│   │   ├── public-store/   # Customer storefront & tracking
+│   │   ├── orders/         # Kitchen & orders Kanban
+│   │   ├── pos/            # Fast cashier POS & payments
+│   │   ├── products/       # Products & variants catalog
+│   │   ├── categories/     # Menu categorization
+│   │   ├── inventory/      # Finished goods stock tracking
+│   │   ├── customers/      # Customer history & profiles
+│   │   ├── payments/       # Verification, refunds, and events
+│   │   ├── finance/        # Cashier shift & expenses
+│   │   ├── reports/        # Analytics & sales reports
+│   │   ├── notifications/  # System & order alerts
+│   │   ├── users/          # Staff roles & permissions
+│   │   └── settings/       # Store & tax configuration
+│   ├── services/           # Supabase & API services
+│   ├── hooks/              # Custom reusable hooks
+│   ├── stores/             # Global Zustand stores
+│   ├── lib/                # Utilities, helpers, and Supabase client
+│   ├── types/              # TypeScript declarations & database types
+│   └── styles/             # Global styles & Tailwind entry
+├── supabase/
+│   ├── config.toml         # Supabase CLI configuration
+│   ├── migrations/         # 12 Migrasi PostgreSQL terurut & modular
+│   ├── functions/          # Edge Functions (Checkout, Tracking, etc.)
+│   └── seed.sql            # Initial data seed (outlet, roles, permissions, menu)
+├── tests/
+│   ├── unit/               # Unit tests (Vitest)
+│   ├── integration/        # Integration tests
+│   └── e2e/                # End-to-end test scenarios
+├── docs/
+│   ├── database/           # ERD, Data Dictionary, RLS Matrix, Storage Policies
+│   └── security/           # Secure Owner Bootstrap procedure
+├── .github/workflows/      # GitHub Actions CI/CD workflows
+├── .env.example            # Environment variables blueprint
+└── package.json
+```
+
+---
+
+## 📚 Dokumentasi Database (Phase 1)
+- [Diagram Relasi Entitas (ERD)](file:///d:/Projects/FOODPOS/docs/database/ERD.md)
+- [Kamus Data (Data Dictionary)](file:///d:/Projects/FOODPOS/docs/database/DATA_DICTIONARY.md)
+- [Prinsip Desain Database & Snapshot](file:///d:/Projects/FOODPOS/docs/database/DATABASE_DESIGN.md)
+- [Matriks Row Level Security (RLS Matrix)](file:///d:/Projects/FOODPOS/docs/database/RLS_MATRIX.md)
+- [Kebijakan Penyimpanan (Storage Policies)](file:///d:/Projects/FOODPOS/docs/database/STORAGE_POLICIES.md)
+- [Panduan Pembuatan Akun Owner (Owner Bootstrap)](file:///d:/Projects/FOODPOS/docs/security/OWNER_BOOTSTRAP.md)
+
+---
+
+## 🚀 Panduan Instalasi & Pengembangan Lokal
+
+### 1. Prasyarat
+- Node.js LTS (v20+ direkomendasikan)
+- npm (v10+)
+- Git
+- Akun Supabase ([supabase.com](https://supabase.com))
+
+### 2. Instalasi Dependency
+```bash
+git clone <repository-url>
+cd FOODPOS
+npm install
+```
+
+### 3. Konfigurasi Environment
+Salin template `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
+Isi kredensial Supabase Anda dari dashboard Supabase:
+```env
+VITE_APP_NAME=FOODPOS
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+### 4. Eksekusi Migrasi Database ke Supabase
+Jalankan berkas migrasi pada direktori `supabase/migrations/` secara berurutan pada Supabase SQL Editor atau melalui Supabase CLI:
+```bash
+# Melalui Supabase SQL Editor:
+# Jalankan berkas 20261109000001 hingga 20261109000012, lalu jalankan supabase/seed.sql
+```
+
+### 5. Menjalankan Server Pengembangan
+```bash
+npm run dev
+```
+Akses `http://localhost:5173`.
+
+### 6. Pengujian & Quality Check
+```bash
+npm run test    # Menjalankan seluruh unit tests
+npm run lint    # Memeriksa standard kode ESLint
+npm run build   # Menguji build produksi TypeScript & Vite
+```
