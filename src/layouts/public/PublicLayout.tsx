@@ -2,9 +2,11 @@ import React from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { UtensilsCrossed, ShoppingBag, Search, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/stores/cartStore";
 
 export const PublicLayout: React.FC = () => {
   const location = useLocation();
+  const totalItems = useCartStore((state) => state.getTotalItems());
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -80,7 +82,7 @@ export const PublicLayout: React.FC = () => {
                 <ShoppingBag className="h-4 w-4 text-primary" />
                 <span className="hidden sm:inline">Keranjang</span>
                 <span className="inline-flex items-center justify-center bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 font-bold">
-                  0
+                  {totalItems}
                 </span>
               </Button>
             </Link>

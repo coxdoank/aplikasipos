@@ -8,6 +8,7 @@ import { HomePage } from "@/modules/public-store/pages/HomePage";
 import { MenuPage } from "@/modules/public-store/pages/MenuPage";
 import { CartPage } from "@/modules/public-store/pages/CartPage";
 import { CheckoutPage } from "@/modules/public-store/pages/CheckoutPage";
+import { OrderConfirmationPage } from "@/modules/public-store/pages/OrderConfirmationPage";
 import { TrackOrderPage } from "@/modules/public-store/pages/TrackOrderPage";
 
 // Backoffice Pages
@@ -33,6 +34,7 @@ export const AppRouter: React.FC = () => {
           <Route path="menu" element={<MenuPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="track" element={<TrackOrderPage />} />
         </Route>
 
