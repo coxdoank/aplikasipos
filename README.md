@@ -68,15 +68,15 @@ FOODPOS/
 
 ---
 
-## 👥 Akun Demo Staf & Hak Akses (RBAC Simulator)
+## 👥 Struktur Peran & Hak Akses (RBAC)
 
-Sistem dilengkapi dengan simulator akun staf bawaan untuk pengujian instan tanpa harus mengatur Supabase Auth terlebih dahulu. Klik tombol **Akun Demo Cepat** pada halaman Login Backoffice (`/#/backoffice/login`):
+Autentikasi staf dikelola secara aman menggunakan **Supabase Auth** terintegrasi dengan tabel `profiles`, `user_roles`, dan `role_permissions` di PostgreSQL. Akses masuk hanya dapat dilakukan melalui kredensial resmi staf pada halaman Login Backoffice (`/#/backoffice/login`):
 
-| Peran | Email | Kata Sandi Default | Cakupan Akses & Wewenang |
-| :--- | :--- | :--- | :--- |
-| **OWNER** | `owner@foodpos.local` | `DemoPassword123!` | **Akses Penuh:** Konfigurasi Sistem, Outlet Switcher, Persetujuan Refund, Manajemen Karyawan, Penyesuaian Pajak PB1, Audit Trail, dan Laporan Finansial. |
-| **ADMIN** | `admin@foodpos.local` | `DemoPassword123!` | **Manajer Resto:** Manajemen Menu & Kategori, Penyesuaian Stok Opname, Persetujuan Refund Dual-Custody, Laporan Penjualan, dan Pengawasan Pesanan. |
-| **CASHIER** | `cashier@foodpos.local` | `DemoPassword123!` | **Kasir POS:** Buka/Tutup Sesi Kas, Transaksi POS, Parkir Tagihan, Verifikasi Bukti Transfer, Pengajuan Refund (Wajib Disetujui Manajer/Owner). Cabang terkunci. |
+| Peran | Tingkat Otoritas | Cakupan Akses & Wewenang |
+| :--- | :--- | :--- |
+| **OWNER** | Pemilik Bisnis (Akses Tertinggi) | **Akses Penuh:** Konfigurasi Sistem, Outlet Switcher, Persetujuan Refund, Manajemen Karyawan, Penyesuaian Pajak PB1, Audit Trail, dan Laporan Finansial. |
+| **ADMIN** | Manajer Restoran | **Manajer Resto:** Manajemen Menu & Kategori, Penyesuaian Stok Opname, Persetujuan Refund Dual-Custody, Laporan Penjualan, dan Pengawasan Pesanan. |
+| **CASHIER** | Kasir Operasional | **Kasir POS:** Buka/Tutup Sesi Kas, Transaksi POS, Parkir Tagihan, Verifikasi Bukti Transfer, Pengajuan Refund (Wajib Disetujui Manajer/Owner). Cabang terkunci. |
 
 ---
 

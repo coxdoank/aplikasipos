@@ -12,7 +12,7 @@ interface AuthState {
   isLoading: boolean;
   errorMessage: string | null;
 
-  login: (email: string, password?: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   hasPermission: (permissionCode: string) => boolean;
   hasRole: (roleName: "OWNER" | "ADMIN" | "CASHIER") => boolean;

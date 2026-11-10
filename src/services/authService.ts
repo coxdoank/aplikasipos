@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
-export type AuthUser = User | { id: string; email?: string };
+export type AuthUser = User;
 
 export interface StaffProfile {
   id: string;
@@ -22,170 +22,131 @@ export interface UserOutletInfo {
   name: string;
 }
 
-export interface DemoAccount {
-  email: string;
-  role: "OWNER" | "ADMIN" | "CASHIER";
-  name: string;
-  permissions: string[];
-}
-
-export const DEMO_STAFF_ACCOUNTS: DemoAccount[] = [
-  {
-    email: "owner@foodpos.local",
-    role: "OWNER",
-    name: "Hendra Wijaya (Pemilik Restoran)",
-    permissions: [
-      "orders.view", "orders.create", "orders.update_status", "orders.cancel",
-      "payments.view", "payments.create", "payments.verify", "payments.refund.request", "payments.refund.approve",
-      "products.view", "products.manage", "inventory.adjust", "reports.view",
-      "users.manage", "settings.manage", "audit.view", "cash_sessions.open", "cash_sessions.close"
-    ],
-  },
-  {
-    email: "admin@foodpos.local",
-    role: "ADMIN",
-    name: "Ratna Sari (Manajer Resto)",
-    permissions: [
-      "orders.view", "orders.create", "orders.update_status", "orders.cancel",
-      "payments.view", "payments.create", "payments.verify", "payments.refund.request", "payments.refund.approve",
-      "products.view", "products.manage", "inventory.adjust", "reports.view",
-      "users.manage", "settings.manage", "audit.view", "cash_sessions.open", "cash_sessions.close"
-    ],
-  },
-  {
-    email: "cashier@foodpos.local",
-    role: "CASHIER",
-    name: "Budi Santoso (Kasir Shift 1)",
-    permissions: [
-      "orders.view", "orders.create", "orders.update_status",
-      "payments.view", "payments.create", "payments.verify", "payments.refund.request",
-      "products.view", "cash_sessions.open", "cash_sessions.close"
-    ],
-  },
-];
-
-const isConfiguredSupabase = (): boolean => {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  return Boolean(url && !url.includes("placeholder-project"));
-};
-
 export const authService = {
-  // Sign in with Supabase Auth or fallback demo simulation
-  async signIn(email: string, password?: string): Promise<{
-    user: AuthUser | null;
+  // Sign in strictly through Supabase Auth (no demo or simulation bypass)
+  async signIn(
+    email: string,
+    password: string
+  ): Promise<{
+    user: AuthUser;
     profile: StaffProfile;
     roleInfo: UserRoleInfo;
     outlet: UserOutletInfo;
   }> {
-    const demo = DEMO_STAFF_ACCOUNTS.find((a) => a.email.toLowerCase() === email.toLowerCase());
-
-    if (!isConfiguredSupabase()) {
-      if (demo) {
-        return {
-          user: { id: `user-${demo.role.toLowerCase()}`, email: demo.email },
-          profile: { id: `user-${demo.role.toLowerCase()}`, fullName: demo.name, email: demo.email },
-          roleInfo: { roleName: demo.role, permissions: demo.permissions },
-          outlet: { id: "e0000000-0000-0000-0000-000000000001", code: "OUT-01", name: "FOODPOS Outlet Pusat" },
-        };
-      }
-      // If user typed a custom email in offline simulator, treat as Cashier
-      return {
-        user: { id: "user-simulated", email },
-        profile: { id: "user-simulated", fullName: email.split("@")[0].toUpperCase(), email },
-        roleInfo: {
-          roleName: "CASHIER",
-          permissions: DEMO_STAFF_ACCOUNTS[2].permissions,
-        },
-        outlet: { id: "e0000000-0000-0000-0000-000000000001", code: "OUT-01", name: "FOODPOS Outlet Pusat" },
-      };
+    const trimmedEmail = email?.trim() || "";
+    if (!trimmedEmail || !password) {
+      throw new Error("Email dan kata sandi wajib diisi.");
     }
 
-    // Connect to real Supabase Auth
+    // 1. Authenticate with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password: password || "FoodposPassword123!",
+      email: trimmedEmail,
+      password,
     });
 
-    if (authError || !authData.user) {
-      if (demo) {
-        // Fallback to demo if credentials fail on remote
-        return {
-          user: { id: `user-${demo.role.toLowerCase()}`, email: demo.email },
-          profile: { id: `user-${demo.role.toLowerCase()}`, fullName: demo.name, email: demo.email },
-          roleInfo: { roleName: demo.role, permissions: demo.permissions },
-          outlet: { id: "e0000000-0000-0000-0000-000000000001", code: "OUT-01", name: "FOODPOS Outlet Pusat" },
-        };
-      }
+    if (authError || !authData?.user) {
       throw new Error(authError?.message || "Email atau kata sandi tidak valid.");
     }
 
-    const userId = authData.user.id;
+    const user = authData.user;
+    const userId = user.id;
 
-    // Fetch profile
-    const { data: profileData } = (await supabase
-      .from("profiles")
-      .select("id, full_name, phone, avatar_url")
-      .eq("id", userId)
-      .single()) as {
-      data: { id: string; full_name: string; phone: string | null; avatar_url: string | null } | null;
-    };
+    try {
+      // 2. Fetch staff profile
+      const { data: profileData, error: profileError } = (await supabase
+        .from("profiles")
+        .select("id, full_name, phone, avatar_url")
+        .eq("id", userId)
+        .maybeSingle()) as {
+        data: { id: string; full_name: string; phone: string | null; avatar_url: string | null } | null;
+        error: Error | null;
+      };
 
-    // Fetch user role
-    const { data: userRoleData } = (await supabase
-      .from("user_roles" as never)
-      .select("roles ( id, name )" as never)
-      .eq("user_id" as never, userId as never)
-      .single()) as { data: { roles: { id: string; name: string } } | null };
+      if (profileError) throw profileError;
 
-    const roleName = (userRoleData?.roles?.name as "OWNER" | "ADMIN" | "CASHIER") || "CASHIER";
+      // 3. Fetch user role
+      const { data: userRoleData, error: roleError } = (await supabase
+        .from("user_roles" as never)
+        .select("roles ( id, name )" as never)
+        .eq("user_id" as never, userId as never)
+        .maybeSingle()) as {
+        data: { roles: { id: string; name: string } | null } | null;
+        error: Error | null;
+      };
 
-    // Fetch permissions
-    const { data: rolePermissionsData } = (await supabase
-      .from("role_permissions" as never)
-      .select("permissions ( code )" as never)
-      .eq("role_id" as never, userRoleData?.roles?.id as never)) as {
-      data: Array<{ permissions: { code: string } }> | null;
-    };
+      if (roleError) throw roleError;
 
-    const permissions = (rolePermissionsData || [])
-      .map((rp) => rp.permissions?.code)
-      .filter(Boolean);
+      const roleRecord = userRoleData?.roles;
+      const roleName = roleRecord?.name as "OWNER" | "ADMIN" | "CASHIER";
 
-    // Fetch assigned outlet
-    const { data: userOutletData } = (await supabase
-      .from("user_outlets" as never)
-      .select("outlets ( id, code, name )" as never)
-      .eq("user_id" as never, userId as never)
-      .limit(1)
-      .single()) as { data: { outlets: UserOutletInfo } | null };
+      if (!roleName || !["OWNER", "ADMIN", "CASHIER"].includes(roleName)) {
+        throw new Error("Akun Anda belum memiliki peran (role) yang valid di sistem.");
+      }
 
-    const outlet = userOutletData?.outlets || {
-      id: "e0000000-0000-0000-0000-000000000001",
-      code: "OUT-01",
-      name: "FOODPOS Outlet Pusat",
-    };
+      // 4. Fetch permissions for the assigned role
+      let permissions: string[] = [];
+      if (roleRecord?.id) {
+        const { data: rolePermissionsData, error: permError } = (await supabase
+          .from("role_permissions" as never)
+          .select("permissions ( code )" as never)
+          .eq("role_id" as never, roleRecord.id as never)) as {
+          data: Array<{ permissions: { code: string } | null }> | null;
+          error: Error | null;
+        };
 
-    return {
-      user: authData.user,
-      profile: {
-        id: userId,
-        fullName: profileData?.full_name || authData.user.email?.split("@")[0] || "Staf",
-        phone: profileData?.phone,
-        avatarUrl: profileData?.avatar_url,
-        email: authData.user.email || email,
-      },
-      roleInfo: {
-        roleName,
-        permissions: permissions.length > 0 ? permissions : DEMO_STAFF_ACCOUNTS.find(a => a.role === roleName)?.permissions || [],
-      },
-      outlet,
-    };
+        if (permError) throw permError;
+
+        permissions = (rolePermissionsData || [])
+          .map((rp) => rp.permissions?.code)
+          .filter((code): code is string => Boolean(code));
+      }
+
+      // 5. Fetch assigned outlet
+      const { data: userOutletData, error: outletError } = (await supabase
+        .from("user_outlets" as never)
+        .select("outlets ( id, code, name )" as never)
+        .eq("user_id" as never, userId as never)
+        .limit(1)
+        .maybeSingle()) as {
+        data: { outlets: UserOutletInfo | null } | null;
+        error: Error | null;
+      };
+
+      if (outletError) throw outletError;
+
+      const outlet = userOutletData?.outlets;
+      if (!outlet?.id) {
+        throw new Error("Akun Anda belum ditugaskan ke cabang outlet.");
+      }
+
+      return {
+        user,
+        profile: {
+          id: userId,
+          fullName: profileData?.full_name || user.email?.split("@")[0] || "Staf",
+          phone: profileData?.phone || null,
+          avatarUrl: profileData?.avatar_url || null,
+          email: user.email || trimmedEmail,
+        },
+        roleInfo: {
+          roleName,
+          permissions,
+        },
+        outlet: {
+          id: outlet.id,
+          code: outlet.code,
+          name: outlet.name,
+        },
+      };
+    } catch (err: unknown) {
+      // Clean up Supabase session if fetching role/profile/outlet failed
+      await supabase.auth.signOut();
+      throw err;
+    }
   },
 
-  // Sign out
+  // Sign out strictly from Supabase Auth
   async signOut(): Promise<void> {
-    if (isConfiguredSupabase()) {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
   },
 };

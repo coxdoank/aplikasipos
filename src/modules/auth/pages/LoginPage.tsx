@@ -10,11 +10,9 @@ import {
   EyeOff,
   Loader2,
   ArrowRight,
-  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
-import { DEMO_STAFF_ACCOUNTS } from "@/services/authService";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,19 +27,9 @@ export const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !password) return;
 
     const success = await login(email.trim(), password);
-    if (success) {
-      navigate(from, { replace: true });
-    }
-  };
-
-  const handleQuickDemoLogin = async (demoEmail: string) => {
-    clearError();
-    setEmail(demoEmail);
-    setPassword("DemoPassword123!");
-    const success = await login(demoEmail, "DemoPassword123!");
     if (success) {
       navigate(from, { replace: true });
     }
@@ -138,30 +126,6 @@ export const LoginPage: React.FC = () => {
               )}
             </Button>
           </form>
-
-          {/* Quick Demo Testing Accounts */}
-          <div className="border-t pt-4 space-y-3">
-            <div className="flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>Akun Demo Cepat (Simulator)</span>
-              <UserCheck className="h-3.5 w-3.5 text-primary" />
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {DEMO_STAFF_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.role}
-                  type="button"
-                  onClick={() => handleQuickDemoLogin(acc.email)}
-                  className="p-2 border rounded-xl text-left bg-muted/20 hover:bg-primary/10 hover:border-primary/40 transition-all text-center flex flex-col items-center"
-                >
-                  <span className="text-[11px] font-bold text-primary">{acc.role}</span>
-                  <span className="text-[9px] text-muted-foreground block truncate max-w-full">
-                    {acc.role === "OWNER" ? "Akses Penuh" : acc.role === "ADMIN" ? "Manajer" : "Kasir POS"}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Security Information Footer */}
