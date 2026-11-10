@@ -86,6 +86,7 @@ FOODPOS/
 - **Phase 4:** Manajemen Pesanan & Kanban (Papan Kanban Drag-and-Drop, FSM Status Mesin, Riwayat Audit Perjalanan Status, Notifikasi Audio Chime Web Audio API, Modal Detail Pesanan Komprehensif, Dialog Pembatalan Aman, Pratinjau Cetak Struk Kasir Termal 58/80mm).
 - **Phase 5:** Antarmuka Kasir POS (Fast-checkout Grid, Kustomisasi Varian & Topping, Pemilihan Meja & Tipe Layanan, Diskon & PB1 10%, Fitur Tahan Pesanan/Hold Bill, Modal Pembayaran Multi-Metode Tunai/QRIS/EDC, Validasi Kembalian, dan Cetak Struk Instan).
 - **Phase 6:** Manajemen Produk, Kategori & Katalog Menu (CRUD Kategori dengan Auto-slug & Proteksi Hapus, CRUD Menu Hidangan dengan SKU Unik & Zod Form, Pengelolaan Dinamis Varian Porsi & Topping Tambahan, Toggle Cepat Ketersediaan Dapur Tersedia/Habis, dan Kontrol Hak Akses `products.manage`).
+- **Phase 7:** Inventori Produk Siap Jual & Mutasi Stok (Buku Besar/Ledger Pergerakan Stok 5 Tipe IN/OUT/ADJUSTMENT/SALE/REFUND, Validasi Anti-Stok Negatif, Penyesuaian Opname Fisik dengan Live Preview, Sinkronisasi Otomatis Status Ketersediaan Habis/Tersedia, 4 KPI Inventori, serta Proteksi Wewenang `inventory.adjust`).
 
 ---
 

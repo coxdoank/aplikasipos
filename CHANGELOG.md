@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] - 2026-11-10
+### Phase 7 — Finished Goods Inventory & Stock Movements
+
+#### Added
+- **Service Layer Inventori & Mutasi Stok (`src/services/inventoryService.ts`):**
+  - Pencatatan buku besar mutasi stok (`stock_movements` ledger) untuk 5 tipe: `IN`, `OUT`, `ADJUSTMENT`, `SALE`, `REFUND`.
+  - Fungsi penyesuaian stok opname `adjustStock` dengan validasi pencegahan nilai stok negatif.
+  - Sinkronisasi otomatis ketersediaan produk: jika stok menyentuh 0, otomatis disetel *Habis*, dan jika bertambah di atas 0 otomatis kembali *Tersedia*.
+  - Fungsi `recordSaleDeduction` untuk pemotongan stok otomatis saat pesanan kasir/online selesai dibayar.
+  - Ringkasan statistik inventori `getInventoryStats` (Menu Dimonitor, Stok Fisik, Stok Menipis $\le 10$, dan Stok Habis).
+- **Komponen Modal Penyesuaian Stok Opname (`StockAdjustmentModal.tsx`):**
+  - Tiga mode penyesuaian: Opname Fisik (`ADJUSTMENT`), Barang Masuk (`IN`), dan Barang Keluar (`OUT`).
+  - Pratinjau kalkulasi langsung (*Live Preview*) dengan status perubahan stok dan peringatan ambang batas.
+  - Pilihan cepat alasan siap pakai (*Preset Reason Chips*) dan input nomor referensi dokumen/PO.
+  - Proteksi wewenang `inventory.adjust` untuk membatasi aksi hanya bagi Owner dan Admin.
+- **Halaman Inventori & Stok Backoffice (`InventoryPage.tsx`):**
+  - 4 Kartu KPI Inventori dengan interaksi klik filter cepat: Menu Dimonitor, Total Unit Fisik, Stok Menipis, dan Stok Habis.
+  - Tab 1: Daftar Stok Produk Jadi dengan foto menu, kode SKU, kategori, harga, status ketersediaan, badge kesehatan stok (*Aman, Menipis, Habis*), dan tombol aksi "Sesuaikan".
+  - Tab 2: Riwayat Mutasi Stok (Ledger) lengkap dengan stempel waktu, produk & SKU, badge tipe mutasi, kuantitas selisih ($+/-$), pergerakan awal $\rightarrow$ akhir, alasan/referensi, dan nama petugas pelaksana.
+  - Toolbar pencarian instan dan penyaringan multi-kategori serta kondisi kesehatan stok.
+- **Pengujian Unit & Integrasi Phase 7 (`tests/unit/phase7_inventory.test.tsx`):**
+  - 14 pengujian menyeluruh mencakup operasi ledger, penolakan stok negatif, toggle otomatis ketersediaan, pemotongan stok penjualan, rendering UI, dan proteksi otorisasi.
+
+---
+
 ## [0.7.0] - 2026-11-10
 ### Phase 6 — Product, Category, and Catalog Management
 

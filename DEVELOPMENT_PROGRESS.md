@@ -1,65 +1,57 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 6 — Product, Category, and Catalog Management
+## Current Phase: PHASE 7 — Finished Goods Inventory & Stock Movements
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 6)
-- [x] **Service Layer Katalog & Kategori (`src/services/catalogService.ts`):**
-  - **CRUD Kategori:**
-    - Pembuatan kategori baru dengan auto-slug generator dari nama kategori (`name` -> `slug`).
-    - Penghitungan dinamis jumlah hidangan terhubung per kategori (`products_count`).
-    - Proteksi keamanan integritas data: mencegah penghapusan kategori jika masih memiliki produk aktif terhubung.
-    - Pengurutan tampilan kategori berdasarkan `display_order`.
-  - **CRUD Produk Menu:**
-    - Pembuatan menu hidangan lengkap: nama, SKU unik terotorisasi (auto-uppercase), relasi kategori, harga dasar, deskripsi, stok fisik, status aktif (`is_active`), dan status ketersediaan dapur (`is_available`).
-    - Validasi ketat pencegahan duplikasi kode SKU.
-    - Pengelolaan varian porsi dinamis (`variants: { name, price_adjustment }`).
-    - Pengelolaan topping dan add-on dinamis (`addons: { name, price }`).
-    - Tombol pintas 1-klik untuk toggle cepat ketersediaan dapur (*Tersedia* <-> *Habis*) dan visibilitas menu (*Aktif* <-> *Nonaktif*).
-    - Persistensi ganda: integrasi Supabase PostgreSQL dengan sinkronisasi lokal `localStorage` (`foodpos_categories_v1`, `foodpos_products_v1`) agar aplikasi bekerja offline dan demo mode.
-- [x] **Manajemen Kategori Menu (`CategoriesPage.tsx` & `CategoryModal.tsx`):**
-  - Tabel kategori responsif dengan kolom urutan, nama kategori, badge slug URL, deskripsi, jumlah produk, dan status aktif.
-  - Form modal pembuatan/pengubahan kategori tervalidasi menggunakan Zod dan React Hook Form.
-  - Dialog konfirmasi penghapusan kategori dengan peringatan proteksi produk terkait.
-  - Toolbar pencarian kategori secara instan.
-- [x] **Katalog Produk & Menu Backoffice (`ProductsPage.tsx` & `ProductModal.tsx`):**
-  - 4 Kartu metrik KPI: *Total Menu*, *Menu Aktif*, *Tersedia di Dapur*, dan *Habis Stok*.
-  - Toolbar penyaringan multi-parameter: pencarian nama/SKU, filter kategori menu, filter ketersediaan dapur (Semua, Tersedia, Habis), dan pengurutan (A-Z, Harga Rendah-Tinggi, Harga Tinggi-Rendah).
-  - Tabel produk lengkap dengan badge SKU, kategori, harga dasar, jumlah varian/topping, stok fisik, tombol cepat toggle ketersediaan dapur (*Tersedia / Habis*), dan switch visibilitas menu.
-  - Modal komprehensif form produk (`ProductModal.tsx`) dengan sistem navigasi 3 tab:
-    1. **Informasi & Stok:** Nama hidangan, SKU, Kategori, Harga Dasar, Stok Fisik, Deskripsi, dan Switch Status.
-    2. **Varian Porsi:** Pengelolaan dinamis daftar porsi (Jumbo, Regular, Dada, Paha) beserta selisih harga (+/- Rp).
-    3. **Topping / Add-on:** Pengelolaan dinamis daftar topping (Telur Ceplok, Nasi Uduk, Sambal Ekstra) beserta harga tambahan.
-  - Tombol reset katalog default untuk kemudahan simulasi dan demonstrasi operasional.
-- [x] **Proteksi Otorisasi Hak Akses:**
-  - Menampilkan katalog menu bagi pengguna berizin `products.view`.
-  - Membatasi tombol tambah, ubah, dan hapus menu/kategori khusus bagi staf berizin `products.manage` (Admin & Owner; dibatasi untuk staf non-manajemen).
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 7)
+- [x] **Service Layer Inventori & Mutasi Stok (`src/services/inventoryService.ts`):**
+  - **Buku Besar Pergerakan Stok (Stock Movement Ledger):**
+    - Audit pencatatan mutasi komprehensif (`id`, `product_id`, `movement_type`, `quantity_change`, `previous_stock`, `new_stock`, `reference_id`, `reason`, `actor_name`, `created_at`).
+    - Dukungan 5 tipe mutasi resmi: `IN` (Barang Masuk/Pembelian), `OUT` (Barang Rusak/Basi/Keluar), `ADJUSTMENT` (Opname Fisik), `SALE` (Penjualan Kasir), dan `REFUND` (Pengembalian).
+  - **Penyesuaian Stok Terotorisasi (`adjustStock`):**
+    - Perhitungan otomatis perubahan stok dan selisih (*delta*).
+    - Proteksi integritas database: pencegahan stok bernilai negatif (`current_stock < 0`) saat pengurangan barang keluar.
+    - Sinkronisasi otomatis ketersediaan produk: jika stok menyentuh 0, `is_available` otomatis disetel `false` (Habis). Jika stok bertambah di atas 0, otomatis dipulihkan ke `true` (Tersedia).
+    - Validasi wajib alasan penyesuaian (*mandatory reason*) dan nomor referensi PO/Opname opsional.
+  - **Integrasi Penjualan & Pengurangan Stok (`recordSaleDeduction`):**
+    - Pengurangan stok fisik instan saat pesanan dibayar dengan referensi nomor order.
+  - **Ringkasan Metrik Inventori (`getInventoryStats`):**
+    - Menghitung Total Menu Dimonitor, Total Unit Fisik, Stok Menipis ($\le 10$ unit), dan Stok Habis ($= 0$ unit).
+- [x] **Modal Penyesuaian Stok & Opname (`StockAdjustmentModal.tsx`):**
+  - Pilihan cepat 3 jenis transaksi: Opname Fisik (`ADJUSTMENT`), Barang Masuk (`IN`), dan Barang Keluar (`OUT`).
+  - Pratinjau perhitungan langsung (*Live Preview Calculation*): menampilkan Stok Awal, Selisih ($+/-$), dan Estimasi Stok Akhir beserta peringatan otomatis jika stok menjadi habis.
+  - Tombol pintas alasan siap pakai (*Preset Reason Chips*) untuk kecepatan pengisian staf.
+  - Proteksi wewenang granular: memeriksa izin `inventory.adjust` (Owner dan Admin diizinkan; Kasir dilarang dengan peringatan banner).
+- [x] **Halaman Pengelolaan Inventori Backoffice (`InventoryPage.tsx`):**
+  - 4 Kartu KPI Inventori interaktif (*Menu Dimonitor*, *Total Stok Fisik*, *Stok Menipis*, *Stok Habis*) dengan tautan klik filter cepat.
+  - Sistem 2 Tab Tampilan:
+    1. **Daftar Stok Produk Jadi:** Tabel stok lengkap dengan foto menu, SKU, kategori, harga dasar, status ketersediaan, badge indikator kesehatan stok (*Aman* hijau, *Menipis* kuning, *Habis* merah), serta tombol aksi "Sesuaikan".
+    2. **Riwayat Mutasi Stok (Ledger):** Buku besar pergerakan stok lengkap dengan stempel waktu, produk & SKU, badge tipe mutasi warna-warni, selisih kuantitas ($+ / -$), stok awal $\rightarrow$ akhir, alasan audit & kode referensi PO/Shift, serta nama petugas pelaksana.
+  - Toolbar pencarian instan nama/SKU/referensi dan filter kondisi kesehatan stok & jenis mutasi.
 - [x] **Pengujian & Kualitas:**
-  - 68 unit & integration tests lulus di 8 test suites (`tests/unit/phase6_catalog.test.tsx` dkk).
+  - 82 unit & integration tests lulus di 9 test suites (`tests/unit/phase7_inventory.test.tsx` dkk).
   - ESLint 0 errors, 0 warnings.
-  - Kompilasi produksi TypeScript & Vite sukses.
+  - Kompilasi produksi TypeScript & Vite sukses tanpa error.
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 6. Seluruh acceptance criteria telah terpenuhi.
+- Tidak ada untuk Phase 7. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/services/catalogService.ts`
-- `src/modules/categories/components/CategoryModal.tsx`
-- `src/modules/products/components/ProductModal.tsx`
-- `tests/unit/phase6_catalog.test.tsx`
+- `src/services/inventoryService.ts`
+- `src/modules/inventory/components/StockAdjustmentModal.tsx`
+- `tests/unit/phase7_inventory.test.tsx`
 
 #### Dimodifikasi:
-- `src/modules/categories/pages/CategoriesPage.tsx`
-- `src/modules/products/pages/ProductsPage.tsx`
+- `src/modules/inventory/pages/InventoryPage.tsx`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -76,18 +68,19 @@
   - `tests/unit/phase4_orders.test.tsx` (15 passed)
   - `tests/unit/phase5_pos.test.tsx` (13 passed)
   - `tests/unit/phase6_catalog.test.tsx` (17 passed)
-  - Total: **68 passed, 0 failed**.
+  - `tests/unit/phase7_inventory.test.tsx` (14 passed)
+  - Total: **82 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-C8BVnoZG.js` (839.61 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-thxwyKwM.js` (872.69 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 6.
+- Tidak ada issue tersisa pada Phase 7.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 7 — Inventory and Stock Management (Finished Goods)**
+- **PHASE 8 — Payments and Financial Recording** (Manajemen Pembayaran, Verifikasi Bukti Transfer, Refund Kasir/Owner, dan Laporan Keuangan Harian Kasir)
