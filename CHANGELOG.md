@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2026-11-10
+### Phase 9 — Customer Management & History
+
+#### Added
+- **Service Layer Manajemen Pelanggan (`src/services/customerService.ts`):**
+  - CRUD database pelanggan dengan validasi format dan keunikan nomor telepon/WhatsApp.
+  - Proteksi integritas keuangan: penolakan penghapusan pelanggan jika memiliki riwayat transaksi (`total_orders > 0`).
+  - Pencarian fleksibel (nama, telepon, email, alamat) dan opsi pengurutan (*recent*, *total_spent*, *orders_count*, *name*).
+  - Penarikan riwayat pesanan pelanggan lintas saluran POS kasir dan online (`getCustomerOrderHistory`).
+  - Perhitungan metrik direktori `getCustomerStats` (Pelanggan Terdaftar, Pelanggan Aktif, Omset Profil, dan Rata-rata Nilai Belanja / AOV).
+- **Formulir Pendaftaran & Edit Pelanggan (`CustomerModal.tsx`):**
+  - Validasi Zod & React Hook Form untuk nama, telepon, email, alamat pengiriman default, catatan alergi/preferensi, dan status aktif.
+- **Modal Profil & Riwayat Belanja Pelanggan (`CustomerDetailModal.tsx`):**
+  - Tampilan profil lengkap: avatar inisial, lencana status, 4 KPI finansial pelanggan (Total Transaksi, LTV, AOV, Kategori Loyal VIP/Reguler/Baru), dan tabel riwayat pesanan terintegrasi.
+- **Halaman Direktori Pelanggan Backoffice (`CustomersPage.tsx`):**
+  - 4 Kartu KPI Pelanggan, toolbar pencarian, filter status, pengurutan data, dan tabel responsif dengan aksi Lihat Riwayat, Edit Profil, dan Hapus.
+- **Pengujian Unit & Integrasi Phase 9 (`tests/unit/phase9_customers.test.tsx`):**
+  - 13 pengujian menyeluruh mencakup validasi data pelanggan, proteksi hapus data bertransaksi, kalkulasi metrik, dan interaksi form modal.
+
+---
+
 ## [0.9.0] - 2026-11-10
 ### Phase 8 — Payments, Verification, Refunds, and Financial Cash Drawer
 

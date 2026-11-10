@@ -9,6 +9,7 @@ import {
   Package,
   CreditCard,
   Wallet,
+  Users,
   FileBarChart,
   Settings,
   Menu,
@@ -38,6 +39,7 @@ const allMenuItems: NavMenuItem[] = [
   { label: "Stok & Inventori", path: "/backoffice/inventory", icon: Package, requiredPermission: "inventory.adjust" },
   { label: "Pembayaran", path: "/backoffice/payments", icon: CreditCard, requiredPermission: "payments.view" },
   { label: "Sesi Kas & Arus Kas", path: "/backoffice/finance", icon: Wallet, requiredPermission: "cash_sessions.open" },
+  { label: "Pelanggan", path: "/backoffice/customers", icon: Users, requiredPermission: "orders.view" },
   { label: "Laporan Keuangan", path: "/backoffice/reports", icon: FileBarChart, requiredPermission: "reports.view" },
   { label: "Pengaturan Toko", path: "/backoffice/settings", icon: Settings, requiredPermission: "settings.manage" },
 ];

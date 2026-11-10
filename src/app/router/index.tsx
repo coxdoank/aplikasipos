@@ -23,6 +23,7 @@ import { CategoriesPage } from "@/modules/categories/pages/CategoriesPage";
 import { InventoryPage } from "@/modules/inventory/pages/InventoryPage";
 import { PaymentsPage } from "@/modules/payments/pages/PaymentsPage";
 import { FinancePage } from "@/modules/finance/pages/FinancePage";
+import { CustomersPage } from "@/modules/customers/pages/CustomersPage";
 import { ReportsPage } from "@/modules/reports/pages/ReportsPage";
 import { SettingsPage } from "@/modules/settings/pages/SettingsPage";
 
@@ -110,6 +111,14 @@ export const AppRouter: React.FC = () => {
             element={
               <ProtectedRoute requiredPermission="cash_sessions.open">
                 <FinancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="customers"
+            element={
+              <ProtectedRoute requiredPermission="orders.view">
+                <CustomersPage />
               </ProtectedRoute>
             }
           />
