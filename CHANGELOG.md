@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.0] - 2026-11-10
+### Phase 13 — Multi-Outlet Readiness & Final Polishing
+
+#### Added
+- **Service Layer Kesiapan Multi-Outlet (`src/services/outletService.ts`):**
+  - Manajemen direktori cabang outlet restoran: Outlet Pusat Senopati (`JKT-01`), Cabang Kemang Urban (`JKT-02`), dan Cabang Dago Heritage Bandung (`BDG-01`).
+  - Mekanisme peralihan outlet aktif (`switchOutlet`, `getActiveOutletId`, `setActiveOutletId`) yang terisolasi aman per cabang.
+  - Pendaftaran outlet baru (`createOutlet`) dengan validasi keunikan kode outlet serta pembaruan data outlet (`updateOutlet`).
+- **Komponen Pemilih Outlet Backoffice (`src/components/shared/OutletSwitcher.tsx`):**
+  - Dropdown selector interaktif di header sistem Backoffice untuk peran `OWNER` dengan daftar cabang, alamat, dan indikator aktif.
+  - Tampilan lencana terkunci (*static locked badge*) untuk kru `CASHIER` guna mencegah pengubahan outlet tanpa otorisasi.
+  - Integrasi aksi `setOutlet` pada `useAuthStore` untuk sinkronisasi instan state cabang operasional.
+- **Indikator Ketahanan Jaringan Offline/Online (`src/components/shared/NetworkStatusIndicator.tsx`):**
+  - Pemantau konektivitas real-time berbasis event browser `online` dan `offline`.
+  - Floating status pill informatif: menampilkan peringatan mode offline (data tersimpan di laci lokal) saat internet terputus, dan konfirmasi pemulihan koneksi saat jaringan kembali normal.
+- **Komponen Tanggap Error Aplikasi (`src/components/shared/ErrorBoundary.tsx`):**
+  - React Error Boundary kelas produksi yang menangkap kegagalan render runtime tak terduga.
+  - Tampilan recovery ramah pengguna berbahasa Indonesia dengan tombol Muat Ulang Halaman dan Kembali ke Beranda.
+- **Pengujian Unit & Integrasi Phase 13 (`tests/unit/phase13_multioutlet_polish.test.tsx`):**
+  - 9 pengujian komprehensif mencakup logika multi-outlet, pencegahan duplikasi kode cabang, interaksi switch outlet Owner vs Cashier, indikator jaringan offline/online, dan pengujian tanggap ErrorBoundary.
+
 ## [0.13.0] - 2026-11-10
 ### Phase 12 — Audit Logs, Security & Notifications
 

@@ -1,62 +1,59 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 12 — Audit Logs, Security & Notifications
+## Current Phase: PHASE 13 — Multi-Outlet Readiness & Final Polishing
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 12)
-- [x] **Service Layer Audit Trail & Kepatuhan Keamanan (`src/services/auditService.ts`):**
-  - **Pencatatan Audit Trail Menyeluruh:**
-    - Merekam seluruh aktivitas operasional restoran: Autentikasi (`AUTH_LOGIN`, `AUTH_LOGOUT`), Pesanan (`ORDER_CREATE`, `ORDER_STATUS_UPDATE`, `ORDER_CANCEL`), Pembayaran & Keuangan (`PAYMENT_VERIFIED`, `PAYMENT_REJECTED`, `REFUND_REQUESTED`, `REFUND_APPROVED`, `CASH_SESSION_OPEN`, `CASH_SESSION_CLOSE`), Stok (`STOCK_ADJUSTMENT`), dan Konfigurasi Toko (`SETTINGS_UPDATE`).
-  - **Mekanisme Perlindungan Privasi & Sanitasi Data:**
-    - Fungsi `sanitizeAuditDetails` yang secara otomatis memindai dan menyamarkan informasi sensitif (password, PIN, token JWT, service role key, API key, nomor kartu) menjadi `******** [TERLINDUNGI]` sebelum disimpan ke dalam penyimpanan log.
-  - **Agregasi Statistik & Ekspor CSV:**
-    - Perhitungan metrik ringkasan aktivitas audit (`getAuditStats`) membagi ke dalam total log, aksi finansial, perubahan stok/katalog, dan keamanan autentikasi.
-    - Generator CSV (`generateAuditCSV`) untuk ekspor arsip kepatuhan dan audit trail pihak ketiga.
-- [x] **Service Layer Notifikasi Operasional Restoran (`src/services/notificationService.ts`):**
-  - Mendukung 5 kategori notifikasi: `ORDER_NEW` (pesanan online baru), `STOCK_LOW` (peringatan stok menipis), `PAYMENT_PENDING` (pembayaran butuh verifikasi), `REFUND_REQUEST` (pengajuan pengembalian dana), dan `SYSTEM_SECURITY` (keamanan sistem & sesi kasir).
-  - Pengelolaan status belum dibaca (*unread count*), penandaan baca per entri (`markAsRead`), dan penandaan baca massal (`markAllAsRead`).
-- [x] **Komponen Pusat Notifikasi Topbar (`src/components/shared/NotificationBell.tsx`):**
-  - Ikon lonceng notifikasi interaktif di header sistem Backoffice.
-  - Lencana reaktif (*badge counter*) jumlah notifikasi belum dibaca dengan animasi visual saat terdapat pesan baru.
-  - Popover dropdown responsif dengan filter Semua vs Belum Dibaca, pembeda ikon visual tiap tipe notifikasi, penghitung waktu relatif ("15 menit lalu"), dan tombol cepat "Tandai Semua Dibaca".
-- [x] **Halaman Audit Trail & Keamanan Sistem (`src/modules/audit/pages/AuditLogsPage.tsx`):**
-  - 4 Kartu KPI Metrik Aktivitas: Total Aktivitas, Aksi Finansial & Kasir, Stok & Pengaturan, serta Autentikasi & Keamanan.
-  - Toolbar pencarian cepat instan (aksi, aktor, email, entity ID) dan dropdown filter kategori aksi, entitas, dan rentang tanggal (Start & End Date).
-  - Tabel audit trail responsif dengan badge kategori warna, stempel waktu WIB, aktor pengguna, entitas, IP address, ringkasan metadata, dan tombol "Inspeksi".
-  - **Modal Inspeksi Metadata JSON:** Penampil kode JSON berformat rapi dengan fitur salin cepat ke clipboard (*Copy JSON*) dan jaminan keamanan sanitasi otomatis.
-- [x] **Routing & Navigasi Backoffice:**
-  - Pendaftaran rute aman `/backoffice/audit` di `src/app/router/index.tsx` dengan proteksi otorisasi `ProtectedRoute requiredPermission="audit.view"`.
-  - Integrasi item menu "Log Audit" dengan ikon `ShieldCheck` di sidebar `BackofficeLayout.tsx`.
-- [x] **Penyempurnaan Tipe Basis Data (`src/types/database.types.ts`):**
-  - Penambahan tipe skema PostgreSQL tabel `notifications` dan `audit_logs`.
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 13)
+- [x] **Service Layer Kesiapan Multi-Outlet (`src/services/outletService.ts`):**
+  - **Manajemen Cabang Restoran Terpadu:**
+    - Direktori 3 outlet awal: Outlet Pusat Senopati (`JKT-01`), Cabang Kemang Urban (`JKT-02`), dan Cabang Dago Heritage Bandung (`BDG-01`).
+    - Penyimpanan lokal berstruktur dengan kemampuan sinkronisasi otomatis ke tabel Supabase `outlets`.
+    - Mekanisme peralihan cabang aktif: `getActiveOutletId`, `setActiveOutletId`, dan `switchOutlet(id)`.
+    - Pendaftaran outlet baru (`createOutlet`) dengan validasi keunikan kode outlet (*case-insensitive*) dan pembaruan data cabang (`updateOutlet`).
+- [x] **Komponen Pemilih Outlet Backoffice (`src/components/shared/OutletSwitcher.tsx`):**
+  - **Dukungan Otorisasi Peran:**
+    - Peran `OWNER`: Dropdown interaktif di header Backoffice dengan nama cabang, kode outlet, alamat cabang, dan centang outlet yang sedang aktif.
+    - Peran `CASHIER`: Lencana statis terkunci (*locked badge*) yang menampilkan cabang penugasan tanpa izin beralih ke outlet lain.
+  - **Integrasi State Global:**
+    - Aksi `setOutlet` pada `useAuthStore` untuk pembaruan instan konteks cabang aktif di seluruh modul sistem.
+- [x] **Indikator Ketahanan Jaringan Offline/Online (`src/components/shared/NetworkStatusIndicator.tsx`):**
+  - Pemantau konektivitas real-time melalui event browser `window.addEventListener('online'/'offline')`.
+  - Floating pill status ramah pengguna:
+    - *Offline*: Peringatan "Mode Offline: Koneksi terputus. Data transaksi tersimpan aman di laci lokal." dengan ikon WifiOff dan animasi visual.
+    - *Online Restoration*: Notifikasi "Koneksi Pulih: Terhubung kembali ke sistem backend FOODPOS." dengan ikon Wifi hijau yang menghilang otomatis setelah 4 detik.
+- [x] **Komponen Tanggap Error Aplikasi (`src/components/shared/ErrorBoundary.tsx`):**
+  - React Error Boundary yang membungkus seluruh aplikasi pada `src/app/providers/index.tsx`.
+  - Layar pemulihan darurat (*recovery screen*) berbahasa Indonesia dengan rincian pesan error serta tombol pintas "Halaman Utama" dan "Muat Ulang Halaman".
+- [x] **Polishing UI/UX & Integrasi Header:**
+  - Penataan header Backoffice yang harmonis: Breadcrumb, Outlet Switcher, Pintasan Toko Publik, Buka Kasir POS, Pusat Notifikasi Lonceng, Profil Pengguna, dan Tombol Logout.
 - [x] **Pengujian & Kualitas:**
-  - 149 unit & integration tests lulus di 14 test suites (`tests/unit/phase12_audit_security.test.tsx` dkk).
+  - 158 unit & integration tests lulus di 15 test suites (`tests/unit/phase13_multioutlet_polish.test.tsx` dkk).
   - ESLint 0 errors, 0 warnings.
   - Kompilasi produksi TypeScript & Vite sukses tanpa error (Exit code 0).
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 12. Seluruh acceptance criteria telah terpenuhi.
+- Tidak ada untuk Phase 13. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/services/auditService.ts`
-- `src/services/notificationService.ts`
-- `src/components/shared/NotificationBell.tsx`
-- `src/modules/audit/pages/AuditLogsPage.tsx`
-- `tests/unit/phase12_audit_security.test.tsx`
+- `src/services/outletService.ts`
+- `src/components/shared/OutletSwitcher.tsx`
+- `src/components/shared/NetworkStatusIndicator.tsx`
+- `src/components/shared/ErrorBoundary.tsx`
+- `tests/unit/phase13_multioutlet_polish.test.tsx`
 
 #### Dimodifikasi:
+- `src/stores/authStore.ts`
 - `src/layouts/backoffice/BackofficeLayout.tsx`
-- `src/app/router/index.tsx`
-- `src/types/database.types.ts`
+- `src/app/providers/index.tsx`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -79,18 +76,19 @@
   - `tests/unit/phase10_reports.test.tsx` (12 passed)
   - `tests/unit/phase11_settings.test.tsx` (14 passed)
   - `tests/unit/phase12_audit_security.test.tsx` (8 passed)
-  - Total: **149 passed, 0 failed**.
+  - `tests/unit/phase13_multioutlet_polish.test.tsx` (9 passed)
+  - Total: **158 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-C7FFZwrP.js` (1,520.48 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-Djk48WUv.js` (1,532.27 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 12.
+- Tidak ada issue tersisa pada Phase 13.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 13 — Multi-Outlet Readiness & Final Polishing** (Peralihan Outlet Dinamis / Outlet Switcher, Isolasi Data Antar-Outlet, Penanganan Kondisi Jaringan & Edge Cases, serta UI/UX Polishing Menyeluruh)
+- **PHASE 14 — E2E Testing, CI/CD GitHub Pages Deployment & Final Documentation** (Uji Alur E2E Transaksi Kasir & Pelacakan Publik, Konfigurasi Alur Kerja GitHub Actions CI/CD Pages, Panduan Setup Lengkap Supabase & POS, serta Serah Terima Sistem Produksi)

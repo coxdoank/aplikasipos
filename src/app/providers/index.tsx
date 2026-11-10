@@ -1,5 +1,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { NetworkStatusIndicator } from "@/components/shared/NetworkStatusIndicator";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,8 +18,11 @@ interface AppProvidersProps {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <NetworkStatusIndicator />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };

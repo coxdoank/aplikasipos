@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import { NotificationBell } from "@/components/shared/NotificationBell";
+import { OutletSwitcher } from "@/components/shared/OutletSwitcher";
 
 interface NavMenuItem {
   label: string;
@@ -205,6 +206,8 @@ export const BackofficeLayout: React.FC = () => {
 
           {/* Quick Actions */}
           <div className="flex items-center gap-2">
+            <OutletSwitcher />
+
             <Link to="/">
               <Button variant="outline" size="sm" className="hidden sm:flex text-xs gap-1.5">
                 <Store className="h-3.5 w-3.5" />

@@ -16,6 +16,7 @@ interface AuthState {
   logout: () => Promise<void>;
   hasPermission: (permissionCode: string) => boolean;
   hasRole: (roleName: "OWNER" | "ADMIN" | "CASHIER") => boolean;
+  setOutlet: (outlet: UserOutletInfo) => void;
   clearError: () => void;
 }
 
@@ -86,6 +87,8 @@ export const useAuthStore = create<AuthState>()(
         if (!state.isAuthenticated) return false;
         return state.role === roleName;
       },
+
+      setOutlet: (outlet: UserOutletInfo) => set({ outlet }),
 
       clearError: () => set({ errorMessage: null }),
     }),
