@@ -87,6 +87,7 @@ FOODPOS/
 - **Phase 5:** Antarmuka Kasir POS (Fast-checkout Grid, Kustomisasi Varian & Topping, Pemilihan Meja & Tipe Layanan, Diskon & PB1 10%, Fitur Tahan Pesanan/Hold Bill, Modal Pembayaran Multi-Metode Tunai/QRIS/EDC, Validasi Kembalian, dan Cetak Struk Instan).
 - **Phase 6:** Manajemen Produk, Kategori & Katalog Menu (CRUD Kategori dengan Auto-slug & Proteksi Hapus, CRUD Menu Hidangan dengan SKU Unik & Zod Form, Pengelolaan Dinamis Varian Porsi & Topping Tambahan, Toggle Cepat Ketersediaan Dapur Tersedia/Habis, dan Kontrol Hak Akses `products.manage`).
 - **Phase 7:** Inventori Produk Siap Jual & Mutasi Stok (Buku Besar/Ledger Pergerakan Stok 5 Tipe IN/OUT/ADJUSTMENT/SALE/REFUND, Validasi Anti-Stok Negatif, Penyesuaian Opname Fisik dengan Live Preview, Sinkronisasi Otomatis Status Ketersediaan Habis/Tersedia, 4 KPI Inventori, serta Proteksi Wewenang `inventory.adjust`).
+- **Phase 8:** Manajemen Pembayaran & Keuangan Sesi Kasir (Verifikasi Bukti Transfer Manual, Alur Refund Dual-Custody Anti-Self-Approval, Buka/Tutup Shift Kasir dengan Rekonsiliasi Kas di Laci, Pencatatan Petty Cash Masuk/Keluar, dan Dashboard Pembayaran 3 Tab).
 
 ---
 

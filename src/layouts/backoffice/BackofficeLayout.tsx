@@ -7,6 +7,8 @@ import {
   Utensils,
   Layers,
   Package,
+  CreditCard,
+  Wallet,
   FileBarChart,
   Settings,
   Menu,
@@ -34,6 +36,8 @@ const allMenuItems: NavMenuItem[] = [
   { label: "Produk & Menu", path: "/backoffice/products", icon: Utensils, requiredPermission: "products.view" },
   { label: "Kategori", path: "/backoffice/categories", icon: Layers, requiredPermission: "products.manage" },
   { label: "Stok & Inventori", path: "/backoffice/inventory", icon: Package, requiredPermission: "inventory.adjust" },
+  { label: "Pembayaran", path: "/backoffice/payments", icon: CreditCard, requiredPermission: "payments.view" },
+  { label: "Sesi Kas & Arus Kas", path: "/backoffice/finance", icon: Wallet, requiredPermission: "cash_sessions.open" },
   { label: "Laporan Keuangan", path: "/backoffice/reports", icon: FileBarChart, requiredPermission: "reports.view" },
   { label: "Pengaturan Toko", path: "/backoffice/settings", icon: Settings, requiredPermission: "settings.manage" },
 ];

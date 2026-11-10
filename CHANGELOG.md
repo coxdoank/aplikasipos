@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2026-11-10
+### Phase 8 — Payments, Verification, Refunds, and Financial Cash Drawer
+
+#### Added
+- **Service Layer Pembayaran & Keuangan (`src/services/paymentService.ts`):**
+  - Manajemen transaksi multi-metode (Tunai, QRIS, Transfer Bank, Kartu Debit/Kredit) dan status pembayaran lengkap.
+  - Verifikasi bukti transfer manual (`verifyPayment`) dengan audio chime dapur dan pemajuan otomatis pesanan ke status `PROCESSING`.
+  - Penolakan bukti transfer palsu (`rejectPayment`) dengan alasan penolakan dan pembatalan pesanan otomatis.
+  - Alur pengembalian dana dual-custody (`requestRefund`, `approveRefund`, `rejectRefund`) dengan proteksi pencegahan persetujuan sendiri (*anti self-approval*).
+  - Manajemen shift kasir (`openCashSession`, `closeCashSession`) dengan kalkulasi otomatis selisih kas fisik di laci (*discrepancy*).
+  - Pencatatan arus kas operasional kasir (`addCashTransaction` / petty cash).
+  - Metrik statistik keuangan `getPaymentStats` (Total Pendapatan Lunas, Tunai vs Non-Tunai, Antrean Verifikasi, dan Total Refund).
+- **Komponen & Antarmuka Pembayaran (`src/modules/payments/`):**
+  - `PaymentVerifyModal.tsx`: Pratinjau gambar bukti transfer, rincian pembayaran, dan aksi verifikasi/penolakan.
+  - `RefundModal.tsx`: Formulir pengajuan refund kasir dan tinjauan persetujuan dengan deteksi aturan dual-custody.
+  - `PaymentsPage.tsx`: Dashboard ringkasan KPI keuangan, pencarian transaksi, dan 3 Tab Navigasi (Semua Pembayaran, Antrean Verifikasi, Pengajuan Refund).
+- **Komponen & Antarmuka Keuangan Sesi Kasir (`src/modules/finance/`):**
+  - `CashSessionModal.tsx`: Pembukaan modal awal kasir dan penutupan shift kasir dengan analisis selisih kas.
+  - `CashTransactionModal.tsx`: Pencatatan kas masuk tambahan dan kas keluar darurat operasional.
+  - `FinancePage.tsx`: Monitoring shift aktif, indikator kas laci saat ini, tabel riwayat shift, dan buku kas kecil.
+- **Pengujian Unit & Integrasi Phase 8 (`tests/unit/phase8_payments_finance.test.tsx`):**
+  - 20 pengujian menyeluruh mencakup verifikasi transfer, alur dual-custody refund, rekonsiliasi shift kasir, dan interaksi UI modal.
+
+---
+
 ## [0.8.0] - 2026-11-10
 ### Phase 7 — Finished Goods Inventory & Stock Movements
 
