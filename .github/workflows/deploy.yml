@@ -39,6 +39,17 @@ jobs:
       - name: Unit & Integration Tests
         run: npm run test
 
+      - name: Validate Supabase Configuration
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::warning title=Missing Supabase Configuration::VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY are not configured in GitHub Secrets or Variables. Production deployment requires these credentials for Supabase Cloud authentication."
+          else
+            echo "Supabase build configuration verified."
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
+
       - name: Production Build
         run: npm run build
         env:

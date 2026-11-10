@@ -1,5 +1,5 @@
-import { supabase } from "@/lib/supabase";
-import type { User } from "@supabase/supabase-js";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import type { User, AuthError } from "@supabase/supabase-js";
 
 export type AuthUser = User;
 
@@ -22,6 +22,70 @@ export interface UserOutletInfo {
   name: string;
 }
 
+/**
+ * Maps Supabase auth and network errors into clear, friendly Indonesian error messages.
+ */
+export const formatAuthErrorMessage = (error: unknown): string => {
+  if (!error) return "Autentikasi gagal. Silakan periksa kredensial Anda.";
+
+  const errObj = error as Partial<AuthError> & { message?: string; name?: string; status?: number };
+  const rawMsg = errObj.message || (error instanceof Error ? error.message : String(error));
+  const lowerMsg = rawMsg.toLowerCase();
+  const status = errObj.status;
+
+  // 1. Unconfigured Supabase environment
+  if (lowerMsg.includes("konfigurasi supabase") || lowerMsg.includes("unconfigured")) {
+    return "Konfigurasi Supabase Cloud belum tersedia di sistem. Hubungi administrator untuk mengisi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY.";
+  }
+
+  // 2. Network / DNS / Failed to fetch errors
+  if (
+    lowerMsg.includes("failed to fetch") ||
+    lowerMsg.includes("networkerror") ||
+    lowerMsg.includes("network request failed") ||
+    lowerMsg.includes("enotfound") ||
+    errObj.name === "AuthRetryableFetchError"
+  ) {
+    return "Gagal terhubung ke server Supabase Cloud. Periksa koneksi internet Anda atau pastikan URL server dapat diakses.";
+  }
+
+  // 3. Invalid credentials
+  if (
+    lowerMsg.includes("invalid login credentials") ||
+    lowerMsg.includes("invalid_credentials") ||
+    lowerMsg.includes("email atau kata sandi tidak valid")
+  ) {
+    return "Email atau kata sandi yang Anda masukkan salah. Silakan periksa kembali.";
+  }
+
+  // 4. Email not confirmed
+  if (lowerMsg.includes("email not confirmed") || lowerMsg.includes("email_not_confirmed")) {
+    return "Alamat email akun ini belum dikonfirmasi. Silakan verifikasi email Anda sebelum masuk.";
+  }
+
+  // 5. Account deactivated / banned
+  if (
+    lowerMsg.includes("user is banned") ||
+    lowerMsg.includes("banned") ||
+    lowerMsg.includes("user_banned") ||
+    lowerMsg.includes("account disabled")
+  ) {
+    return "Akun staf ini telah dinonaktifkan oleh administrator restoran.";
+  }
+
+  // 6. Rate limit / Too many requests
+  if (status === 429 || lowerMsg.includes("too many requests") || lowerMsg.includes("rate limit")) {
+    return "Terlalu banyak percobaan masuk. Mohon tunggu beberapa saat sebelum mencoba kembali.";
+  }
+
+  // 7. Server error (5xx)
+  if (status && status >= 500) {
+    return "Layanan autentikasi Supabase sedang mengalami gangguan teknis (Server Error 5xx). Silakan coba lagi nanti.";
+  }
+
+  return rawMsg;
+};
+
 export const authService = {
   // Sign in strictly through Supabase Auth (no demo or simulation bypass)
   async signIn(
@@ -38,14 +102,29 @@ export const authService = {
       throw new Error("Email dan kata sandi wajib diisi.");
     }
 
+    // 0. Ensure Supabase environment configuration is present
+    if (!isSupabaseConfigured()) {
+      throw new Error(
+        "Konfigurasi Supabase Cloud belum tersedia di sistem. Hubungi administrator untuk mengisi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY."
+      );
+    }
+
     // 1. Authenticate with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: trimmedEmail,
-      password,
-    });
+    let authData;
+    let authError: AuthError | null = null;
+    try {
+      const res = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+      authData = res.data;
+      authError = res.error;
+    } catch (networkErr: unknown) {
+      throw new Error(formatAuthErrorMessage(networkErr));
+    }
 
     if (authError || !authData?.user) {
-      throw new Error(authError?.message || "Email atau kata sandi tidak valid.");
+      throw new Error(formatAuthErrorMessage(authError || new Error("Autentikasi gagal.")));
     }
 
     const user = authData.user;
@@ -140,7 +219,15 @@ export const authService = {
       };
     } catch (err: unknown) {
       // Clean up Supabase session if fetching role/profile/outlet failed
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // ignore signout error
+      }
+      const rawMsg = err instanceof Error ? err.message : String(err);
+      if (rawMsg.toLowerCase().includes("fetch") || rawMsg.toLowerCase().includes("network")) {
+        throw new Error(formatAuthErrorMessage(err));
+      }
       throw err;
     }
   },

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import { HashRouter } from "react-router-dom";
@@ -11,6 +11,8 @@ import App from "@/App";
 describe("PHASE 3 — Backoffice Foundation and Supabase Authentication Verification", () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    vi.stubEnv("VITE_SUPABASE_URL", "https://mock-foodpos.supabase.co");
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "mock-foodpos-key-12345");
     useAuthStore.setState({
       user: null,
       profile: null,
@@ -22,6 +24,10 @@ describe("PHASE 3 — Backoffice Foundation and Supabase Authentication Verifica
       errorMessage: null,
     });
     window.location.hash = "#/";
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("renders LoginPage with standard email/password fields and WITHOUT demo login UI", () => {
@@ -230,7 +236,7 @@ describe("PHASE 3 — Backoffice Foundation and Supabase Authentication Verifica
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().user).toBeNull();
     expect(useAuthStore.getState().role).toBeNull();
-    expect(useAuthStore.getState().errorMessage).toContain("Invalid login credentials");
+    expect(useAuthStore.getState().errorMessage).toContain("Email atau kata sandi yang Anda masukkan salah");
   });
 
   it("submits login form via UI and triggers Supabase Auth", async () => {
@@ -260,8 +266,83 @@ describe("PHASE 3 — Backoffice Foundation and Supabase Authentication Verifica
       });
     });
 
-    await screen.findByText(/Email atau kata sandi tidak valid/i);
+    await screen.findByText(/Email atau kata sandi yang Anda masukkan salah/i);
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it("differentiates network connection failure (Failed to fetch)", async () => {
+    vi.spyOn(supabase.auth, "signInWithPassword").mockRejectedValueOnce(
+      new TypeError("Failed to fetch")
+    );
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Gagal terhubung ke server Supabase Cloud");
+  });
+
+  it("differentiates unconfigured Supabase environment", async () => {
+    vi.stubEnv("VITE_SUPABASE_URL", "");
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "");
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Konfigurasi Supabase Cloud belum tersedia");
+
+    // Restore stubbed env
+    vi.stubEnv("VITE_SUPABASE_URL", "https://test-project.supabase.co");
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "test-valid-anon-key");
+  });
+
+  it("differentiates unconfirmed email address", async () => {
+    vi.spyOn(supabase.auth, "signInWithPassword").mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { message: "Email not confirmed", status: 400 } as never,
+    });
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Alamat email akun ini belum dikonfirmasi");
+  });
+
+  it("differentiates deactivated / banned staff account", async () => {
+    vi.spyOn(supabase.auth, "signInWithPassword").mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { message: "User is banned", status: 403 } as never,
+    });
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Akun staf ini telah dinonaktifkan");
+  });
+
+  it("differentiates rate limit / too many requests (429)", async () => {
+    vi.spyOn(supabase.auth, "signInWithPassword").mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { message: "over_request_rate_limit", status: 429 } as never,
+    });
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Terlalu banyak percobaan masuk");
+  });
+
+  it("differentiates Supabase server error (500)", async () => {
+    vi.spyOn(supabase.auth, "signInWithPassword").mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { message: "Internal server error", status: 500 } as never,
+    });
+
+    const success = await useAuthStore.getState().login("staff@resto.id", "Secret123!");
+
+    expect(success).toBe(false);
+    expect(useAuthStore.getState().errorMessage).toContain("Server Error 5xx");
   });
 
   it("redirects unauthenticated users attempting to access /backoffice to /backoffice/login", async () => {
