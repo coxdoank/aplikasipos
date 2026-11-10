@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.11.0] - 2026-11-10
+### Phase 10 — Backoffice Analytics, Reports, and Business Insights
+
+#### Added
+- **Service Layer Analitik & Laporan Bisnis (`src/services/reportService.ts`):**
+  - Kalkulasi metrik KPI utama dalam rentang tanggal fleksibel: Penjualan Bersih (Net Sales), Pesanan Selesai (Completed Orders), Rata-rata Nilai Belanja (AOV), dan Akumulasi Pajak PB1 10%.
+  - Agregasi tren penjualan harian (`getDailySalesTrend`) untuk visualisasi pendapatan per hari.
+  - Peringkat 10 menu terlaris (`getTopSellingProducts`) berdasarkan kuantitas terjual dan kontribusi omset.
+  - Analisis komposisi saluran penjualan (`getChannelBreakdown`) antara transaksi langsung POS Kasir vs Pesanan Online.
+  - Analisis metode pembayaran (`getPaymentMethodBreakdown`) antara Tunai, QRIS, Transfer Bank, dan Kartu Debit/Kredit.
+  - Analisis jam sibuk restoran / peak dining hours (`getHourlySalesTrend`) dari pukul 08:00 hingga 21:00.
+  - Utilitas ekspor data laporan komprehensif ke format CSV (`generateCSV`) yang aman untuk unduhan browser.
+- **Halaman Laporan & Analisis Bisnis (`src/modules/reports/pages/ReportsPage.tsx`):**
+  - Filter rentang waktu dinamis: Hari Ini, 7 Hari Terakhir, 30 Hari Terakhir, Bulan Ini, dan Semua Periode.
+  - 4 Kartu Metrik KPI Eksekutif dengan perbandingan indikator pertumbuhan.
+  - 4 Visualisasi Grafik Interaktif Recharts:
+    - *BarChart*: Tren Penjualan Harian dengan tooltips mata uang Rupiah.
+    - *LineChart*: Analisis Jam Sibuk Restoran (*Peak Dining Hours*).
+    - *PieChart/Donut*: Komposisi Metode Pembayaran pelanggan dengan palet warna representatif.
+    - *Channel Composition Progress Bar*: Proporsi pesanan Dine-In/Takeaway kasir dibandingkan Pesanan Online & Delivery.
+  - Tabel Peringkat Menu Terlaris (*Top Selling Products*) dengan indikator persentase kontribusi dan status inventori.
+  - Tombol Ekspor CSV instan dan pintasan Cetak Laporan (`window.print()`).
+- **Pengujian Unit & Integrasi Phase 10 (`tests/unit/phase10_reports.test.tsx`):**
+  - 12 pengujian mencakup perhitungan metrik penjualan, tren harian, ranking top produk, breakdown kanal/metode pembayaran, jam sibuk, sanitasi ekspor CSV, dan render UI laporan dengan mock Recharts.
+
 ## [0.10.0] - 2026-11-10
 ### Phase 9 — Customer Management & History
 

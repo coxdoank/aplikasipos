@@ -89,6 +89,7 @@ FOODPOS/
 - **Phase 7:** Inventori Produk Siap Jual & Mutasi Stok (Buku Besar/Ledger Pergerakan Stok 5 Tipe IN/OUT/ADJUSTMENT/SALE/REFUND, Validasi Anti-Stok Negatif, Penyesuaian Opname Fisik dengan Live Preview, Sinkronisasi Otomatis Status Ketersediaan Habis/Tersedia, 4 KPI Inventori, serta Proteksi Wewenang `inventory.adjust`).
 - **Phase 8:** Manajemen Pembayaran & Keuangan Sesi Kasir (Verifikasi Bukti Transfer Manual, Alur Refund Dual-Custody Anti-Self-Approval, Buka/Tutup Shift Kasir dengan Rekonsiliasi Kas di Laci, Pencatatan Petty Cash Masuk/Keluar, dan Dashboard Pembayaran 3 Tab).
 - **Phase 9:** Manajemen & Direktori Pelanggan (Database Profil Pelanggan Guest vs Terdaftar, Validasi Keunikan Kontak, Proteksi Penghapusan Berdasarkan Riwayat Transaksi, Metrik LTV & AOV per Pelanggan, Modal Riwayat Pesanan Lengkap, serta Navigasi Menu Pelanggan).
+- **Phase 10:** Analitik Backoffice, Laporan Penjualan & Business Insights (Filter Periode Waktu Fleksibel, 4 KPI Penjualan & Pajak PB1, Visualisasi Grafik Recharts Tren Harian & Jam Sibuk, Analisis Metode Pembayaran & Kanal POS vs Online, Tabel Top 10 Menu Terlaris, serta Ekspor Laporan CSV).
 
 ---
 

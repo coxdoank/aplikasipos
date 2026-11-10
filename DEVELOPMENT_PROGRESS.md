@@ -1,61 +1,55 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 9 — Customer Management & History
+## Current Phase: PHASE 10 — Backoffice Analytics, Reports, and Business Insights
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 9)
-- [x] **Service Layer Manajemen Pelanggan (`src/services/customerService.ts`):**
-  - **CRUD & Direktori Pelanggan:**
-    - Pendaftaran pelanggan baru dengan validasi keunikan nomor telepon/WhatsApp (`createCustomer`).
-    - Pembaruan profil pelanggan (`name`, `phone`, `email`, `address`, `notes`, `is_active`).
-    - Proteksi keamanan data keuangan: mencegah penghapusan data pelanggan jika memiliki riwayat pesanan (`total_orders > 0`), merekomendasikan opsi nonaktifkan akun demi kepatuhan audit.
-  - **Pencarian & Penyaringan Lintas Kriteria:**
-    - Pencarian cepat instan berdasarkan nama, nomor telepon, alamat email, atau alamat tempat tinggal.
-    - Pengurutan data (*Sorting*): Terakhir Transaksi, Total Belanja Terbanyak (LTV), Jumlah Pesanan Terbanyak, dan Abjad Nama (A-Z).
-  - **Riwayat Pesanan Pelanggan (`getCustomerOrderHistory`):**
-    - Menghubungkan pesanan POS kasir dan pesanan online yang sesuai dengan ID pelanggan atau nomor telepon.
-  - **Metrik Agregasi Direktori Pelanggan (`getCustomerStats`):**
-    - Menghitung Total Pelanggan Terdaftar, Pelanggan Aktif, Total Omset dari Pelanggan Terdaftar, Rata-rata Nilai Belanja (*Average Order Value / AOV*), dan Pelanggan Baru Bulan Ini.
-- [x] **Komponen Form Pelanggan (`src/modules/customers/components/CustomerModal.tsx`):**
-  - Formulir pendaftaran/pengubahan pelanggan dengan validasi Zod & React Hook Form (minimal nama 2 karakter, format nomor telepon, validasi email opsional, alamat pengiriman, dan switch status aktif).
-- [x] **Modal Profil & Riwayat Pesanan (`CustomerDetailModal.tsx`):**
-  - Tampilan profil lengkap: avatar inisial nama, lencana status akun, rincian kontak (telepon, email, alamat).
-  - Peringatan preferensi & alergi pelanggan.
-  - 4 Kartu KPI Pelanggan: Total Transaksi, Akumulasi Belanja (*Lifetime Value / LTV*), Rata-rata Belanja (*AOV*), dan Kategori Status Pelanggan (*Loyal VIP*, *Reguler*, *Baru*).
-  - Tabel riwayat pesanan interaktif (No. Pesanan, Waktu, Saluran & Tipe Layanan, Status, dan Total Belanja).
-- [x] **Halaman Direktori Pelanggan (`CustomersPage.tsx`):**
-  - 4 Kartu Metrik KPI Pelanggan.
-  - Toolbar pencarian instan dan filter status (Semua, Aktif, Nonaktif) serta dropdown pengurutan.
-  - Tabel pelanggan responsif dengan aksi: Lihat Profil & Riwayat, Edit Data, dan Hapus.
-- [x] **Routing & Navigasi Backoffice:**
-  - Integrasi rute `/backoffice/customers` (`orders.view`) di `AppRouter.tsx` dan `BackofficeLayout.tsx` (Menu "Pelanggan" dengan ikon `Users`).
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 10)
+- [x] **Service Layer Analitik & Laporan Bisnis (`src/services/reportService.ts`):**
+  - **Kalkulasi Metrik Penjualan & Pajak:**
+    - Perhitungan metrik berdasarkan rentang tanggal: Penjualan Bersih (*Net Sales* = Omset Bruto dikurangi Pajak PB1), Total Pesanan Selesai (*Completed Orders*), Rata-rata Nilai Transaksi (*Average Order Value / AOV*), dan Akumulasi Pajak PB1 10%.
+  - **Visualisasi Tren & Pola Penjualan:**
+    - Tren penjualan harian (`getDailySalesTrend`) menyajikan riwayat omset per tanggal dalam rentang filter.
+    - Analisis jam operasional sibuk (*Peak Dining Hours*) restoran (`getHourlySalesTrend`) dari pukul 08:00 hingga 21:00 untuk optimalisasi shift pegawai.
+  - **Peringkat Menu & Kontribusi Pendapatan:**
+    - Pemeringkatan 10 produk menu terlaris (`getTopSellingProducts`) berdasarkan kuantitas item terjual, akumulasi rupiah omset, dan persentase kontribusi terhadap total menu terjual.
+  - **Analisis Segmentasi Saluran & Pembayaran:**
+    - Komposisi saluran transaksi (`getChannelBreakdown`): Perbandingan persentase pesanan kasir POS (Dine-in & Takeaway) dengan pesanan mandiri online (Pickup & Delivery).
+    - Komposisi metode pembayaran (`getPaymentMethodBreakdown`): Tunai, QRIS statis, Transfer Bank manual, dan Kartu Debit/Kredit EDC.
+  - **Ekspor Data & Pelaporan:**
+    - Generator CSV (`generateCSV`) dengan sanitasi nilai teks, koma, kutip dua, dan header laporan yang siap diunduh secara aman di lingkungan browser.
+- [x] **Halaman Dashboard Laporan & Analitik (`src/modules/reports/pages/ReportsPage.tsx`):**
+  - Pemilihan rentang waktu interaktif (Hari Ini, 7 Hari Terakhir, 30 Hari Terakhir, Bulan Ini, dan Semua Riwayat).
+  - 4 Kartu KPI Ringkasan Penjualan Eksekutif: Penjualan Bersih, Pesanan Selesai, Nilai Rata-rata Pesanan (AOV), dan Setoran Pajak PB1 10%.
+  - 4 Visualisasi Grafik Interaktif Recharts:
+    1. *BarChart*: Tren Penjualan Harian dengan tooltips format mata uang Rupiah.
+    2. *LineChart*: Frekuensi Transaksi Jam Sibuk (*Peak Hours*).
+    3. *PieChart / Donut*: Distribusi Metode Pembayaran Pelanggan.
+    4. *Channel Progress Bar*: Komparasi Proporsi Kanal POS Kasir vs Pesanan Online.
+  - Tabel Peringkat Menu Terlaris (*Top 10 Selling Products*) lengkap dengan visual bar kontribusi dan status ketersediaan inventori.
+  - Tombol Ekspor CSV dan Tombol Cetak Laporan (`window.print()`).
 - [x] **Pengujian & Kualitas:**
-  - 115 unit & integration tests lulus di 11 test suites (`tests/unit/phase9_customers.test.tsx` dkk).
+  - 127 unit & integration tests lulus di 12 test suites (`tests/unit/phase10_reports.test.tsx` dkk).
   - ESLint 0 errors, 0 warnings.
-  - Kompilasi produksi TypeScript & Vite sukses tanpa error.
+  - Kompilasi produksi TypeScript & Vite sukses tanpa error (Exit code 0).
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 9. Seluruh acceptance criteria telah terpenuhi.
+- Tidak ada untuk Phase 10. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/services/customerService.ts`
-- `src/modules/customers/components/CustomerModal.tsx`
-- `src/modules/customers/components/CustomerDetailModal.tsx`
-- `src/modules/customers/pages/CustomersPage.tsx`
-- `tests/unit/phase9_customers.test.tsx`
+- `src/services/reportService.ts`
+- `tests/unit/phase10_reports.test.tsx`
 
 #### Dimodifikasi:
-- `src/app/router/index.tsx`
-- `src/layouts/backoffice/BackofficeLayout.tsx`
+- `src/modules/reports/pages/ReportsPage.tsx`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -75,18 +69,19 @@
   - `tests/unit/phase7_inventory.test.tsx` (14 passed)
   - `tests/unit/phase8_payments_finance.test.tsx` (20 passed)
   - `tests/unit/phase9_customers.test.tsx` (13 passed)
-  - Total: **115 passed, 0 failed**.
+  - `tests/unit/phase10_reports.test.tsx` (12 passed)
+  - Total: **127 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-izL2Arol.js` (989.77 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-BTf6MbGg.js` (1,443.48 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 9.
+- Tidak ada issue tersisa pada Phase 10.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 10 — Backoffice Analytics, Reports, and Business Insights** (Laporan Penjualan Harian/Bulanan, Menu Terlaris/Top Seller, Grafik Analitik Recharts, Breakdown Saluran POS vs Online, dan Ekspor Laporan)
+- **PHASE 11 — Settings & System Configuration** (Pengaturan Profil Restoran, Tarif Pajak PB1 & Service Charge, Konfigurasi Pembayaran QRIS/Bank, Format Nomor Struk & Template Cetak Kasir)
