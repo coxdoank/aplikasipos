@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.13.0] - 2026-11-10
+### Phase 12 — Audit Logs, Security & Notifications
+
+#### Added
+- **Service Layer Audit Trail & Kepatuhan Keamanan (`src/services/auditService.ts`):**
+  - Pencatatan aktivitas operasional restoran secara menyeluruh (login, logout, order create, pembayaran, refund, buka/tutup shift kasir, penyesuaian stok opname, dan pembaruan pengaturan toko).
+  - Mekanisme perlindungan privasi & sanitasi otomatis: masking data sensitif (password, token, apiKey, secret, PIN) sebelum disimpan ke log.
+  - Perhitungan metrik ringkasan audit (`getAuditStats`) berdasarkan kategori finansial, stok, dan autentikasi.
+  - Ekspor riwayat audit trail terstruktur ke file format CSV (`generateAuditCSV`).
+- **Service Layer Notifikasi Operasional (`src/services/notificationService.ts`):**
+  - Manajemen notifikasi internal restoran untuk tipe `ORDER_NEW`, `STOCK_LOW`, `PAYMENT_PENDING`, `REFUND_REQUEST`, dan `SYSTEM_SECURITY`.
+  - Pelacakan status pesan dibaca / belum dibaca dan penghitung reaktif unread count.
+  - Aksi pembaruan tanda baca per pesan (`markAsRead`) maupun massal (`markAllAsRead`).
+- **Pusat Notifikasi Interaktif Topbar (`src/components/shared/NotificationBell.tsx`):**
+  - Ikon lonceng notifikasi dengan lencana reaktif jumlah pesan baru di header backoffice.
+  - Popover dropdown responsif dengan filter Semua vs Belum Dibaca, ikon pembeda tipe pesan, format waktu relatif (misal: "15 menit lalu"), dan tombol cepat Tandai Semua Dibaca.
+- **Halaman Log Audit Backoffice (`src/modules/audit/pages/AuditLogsPage.tsx`):**
+  - 4 Kartu Ringkasan Metrik (Total Aktivitas, Aksi Finansial, Perubahan Stok, dan Autentikasi).
+  - Toolbar pencarian kata kunci dan filter multi-kriteria (Aksi, Entitas, Rentang Tanggal).
+  - Tabel audit trail responsif dengan badge kategori warna, penunjuk waktu WIB, aktor, IP address, dan ringkasan metadata.
+  - Modal Inspeksi JSON: Viewer kode JSON berformat rapi dengan fitur salin cepat ke clipboard dan jaminan privasi data tersanitasi.
+  - Integrasi rute aman `/backoffice/audit` dengan penjagaan hak akses `audit.view`.
+- **Pengujian Unit & Integrasi Phase 12 (`tests/unit/phase12_audit_security.test.tsx`):**
+  - 8 pengujian otomatis mencakup sanitasi data sensitif, kalkulasi metrik audit, filter pencarian, ekspor CSV, alur notifikasi, interaksi UI lonceng notifikasi, dan modal inspeksi JSON.
+
 ## [0.12.0] - 2026-11-10
 ### Phase 11 — Settings & System Configuration
 

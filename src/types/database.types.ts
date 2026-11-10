@@ -772,6 +772,79 @@ export interface Database {
           updated_at?: string;
         };
       };
+      notifications: {
+        Row: {
+          id: string;
+          outlet_id: string;
+          recipient_user_id: string | null;
+          title: string;
+          message: string;
+          type: string;
+          is_read: boolean;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          outlet_id: string;
+          recipient_user_id?: string | null;
+          title: string;
+          message: string;
+          type: string;
+          is_read?: boolean;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          outlet_id?: string;
+          recipient_user_id?: string | null;
+          title?: string;
+          message?: string;
+          type?: string;
+          is_read?: boolean;
+          metadata?: Json;
+          created_at?: string;
+        };
+      };
+      audit_logs: {
+        Row: {
+          id: string;
+          outlet_id: string | null;
+          actor_id: string | null;
+          actor_email: string | null;
+          action: string;
+          entity_type: string;
+          entity_id: string | null;
+          details: Json;
+          ip_address: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          outlet_id?: string | null;
+          actor_id?: string | null;
+          actor_email?: string | null;
+          action: string;
+          entity_type: string;
+          entity_id?: string | null;
+          details?: Json;
+          ip_address?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          outlet_id?: string | null;
+          actor_id?: string | null;
+          actor_email?: string | null;
+          action?: string;
+          entity_type?: string;
+          entity_id?: string | null;
+          details?: Json;
+          ip_address?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Functions: {
       bootstrap_initial_owner: {

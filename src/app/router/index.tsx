@@ -26,6 +26,7 @@ import { FinancePage } from "@/modules/finance/pages/FinancePage";
 import { CustomersPage } from "@/modules/customers/pages/CustomersPage";
 import { ReportsPage } from "@/modules/reports/pages/ReportsPage";
 import { SettingsPage } from "@/modules/settings/pages/SettingsPage";
+import { AuditLogsPage } from "@/modules/audit/pages/AuditLogsPage";
 
 // Security & Shared Components
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
@@ -127,6 +128,14 @@ export const AppRouter: React.FC = () => {
             element={
               <ProtectedRoute requiredPermission="reports.view">
                 <ReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="audit"
+            element={
+              <ProtectedRoute requiredPermission="audit.view">
+                <AuditLogsPage />
               </ProtectedRoute>
             }
           />

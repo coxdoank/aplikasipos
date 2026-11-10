@@ -19,9 +19,11 @@ import {
   LogOut,
   User,
   Shield,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 
 interface NavMenuItem {
   label: string;
@@ -41,6 +43,7 @@ const allMenuItems: NavMenuItem[] = [
   { label: "Sesi Kas & Arus Kas", path: "/backoffice/finance", icon: Wallet, requiredPermission: "cash_sessions.open" },
   { label: "Pelanggan", path: "/backoffice/customers", icon: Users, requiredPermission: "orders.view" },
   { label: "Laporan Keuangan", path: "/backoffice/reports", icon: FileBarChart, requiredPermission: "reports.view" },
+  { label: "Log Audit", path: "/backoffice/audit", icon: ShieldCheck, requiredPermission: "audit.view" },
   { label: "Pengaturan Toko", path: "/backoffice/settings", icon: Settings, requiredPermission: "settings.manage" },
 ];
 
@@ -217,6 +220,8 @@ export const BackofficeLayout: React.FC = () => {
                 </Button>
               </Link>
             )}
+
+            <NotificationBell />
 
             <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
 
