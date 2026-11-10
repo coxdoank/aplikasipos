@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { HashRouter } from "react-router-dom";
@@ -257,6 +257,69 @@ describe("Phase 11: Settings & System Configuration", () => {
       await waitFor(() => {
         expect(screen.getByText(/Konfigurasi toko dan operasional berhasil disimpan ke sistem!/i)).toBeInTheDocument();
       });
+    });
+
+    it("persists modified restaurant identity without reverting upon re-visiting page", async () => {
+      const { unmount } = render(
+        <HashRouter>
+          <SettingsPage />
+        </HashRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText(/FOODPOS Resto & Coffee/i)).toBeInTheDocument();
+      });
+
+      const brandInput = screen.getByPlaceholderText(/FOODPOS Resto & Coffee/i);
+      const taglineInput = screen.getByPlaceholderText(/Sajian Lezat Berkualitas/i);
+
+      fireEvent.change(brandInput, { target: { value: "Resto Padang Modern 88" } });
+      fireEvent.change(taglineInput, { target: { value: "Cita Rasa Otentik Minang" } });
+
+      const saveBtn = screen.getByRole("button", { name: /Simpan Pengaturan/i });
+      fireEvent.click(saveBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Konfigurasi toko dan operasional berhasil disimpan ke sistem!/i)).toBeInTheDocument();
+      });
+
+      // Simulate navigating away by unmounting SettingsPage
+      unmount();
+
+      // Simulate re-visiting SettingsPage
+      render(
+        <HashRouter>
+          <SettingsPage />
+        </HashRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue("Resto Padang Modern 88")).toBeInTheDocument();
+        expect(screen.getByDisplayValue("Cita Rasa Otentik Minang")).toBeInTheDocument();
+      });
+    });
+
+    it("displays error banner and does NOT show success alert when store settings update fails", async () => {
+      vi.spyOn(settingService, "updateStoreSettings").mockRejectedValueOnce(
+        new Error("Koneksi database terputus.")
+      );
+
+      render(
+        <HashRouter>
+          <SettingsPage />
+        </HashRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /Simpan Pengaturan/i })).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: /Simpan Pengaturan/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Koneksi database terputus.")).toBeInTheDocument();
+      });
+      expect(screen.queryByText(/Konfigurasi toko dan operasional berhasil disimpan/i)).not.toBeInTheDocument();
     });
 
     it("shows read-only alert and disables inputs when cashier lacks settings.manage permission", async () => {

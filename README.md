@@ -60,10 +60,10 @@ FOODPOS/
 │   ├── types/                  # TypeScript Data Models & DTOs
 │   └── styles/                 # Global Tailwind Styles
 ├── supabase/
-│   ├── migrations/             # 13 Migrasi PostgreSQL Terurut & Modular
+│   ├── migrations/             # 14 Migrasi PostgreSQL Terurut & Modular
 │   └── seed.sql                # Initial Data Seed (Outlets, Roles, Menu, Staff)
 ├── tests/
-│   └── unit/                   # 16 Test Suites (164 Unit & E2E Integration Tests)
+│   └── unit/                   # 16 Test Suites (172 Unit & E2E Integration Tests)
 ├── docs/                       # Arsitektur Database, ERD, RLS, & Owner Bootstrap
 ├── DEVELOPMENT_PROGRESS.md     # Catatan Progres 100% Selesai (Phase 0 - 14)
 ├── CHANGELOG.md                # Riwayat Versi v1.0.0

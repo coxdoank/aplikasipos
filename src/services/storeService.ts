@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { CartItem } from "@/stores/cartStore";
 import { orderService } from "@/services/orderService";
 
@@ -250,8 +250,7 @@ const LOCAL_MOCK_ORDERS: Record<string, OrderTrackResult> = {};
 // ==============================================================================
 
 const isConfiguredSupabase = (): boolean => {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  return Boolean(url && !url.includes("placeholder-project"));
+  return isSupabaseConfigured();
 };
 
 export const storeService = {
@@ -267,12 +266,13 @@ export const storeService = {
         .eq("is_active", true)
         .order("display_order", { ascending: true });
 
-      if (error || !data || data.length === 0) {
-        return MOCK_CATEGORIES;
+      if (error) {
+        console.error("Error fetching categories from Supabase:", error);
+        return [];
       }
-      return data;
+      return data || [];
     } catch {
-      return MOCK_CATEGORIES;
+      return [];
     }
   },
 
@@ -312,18 +312,13 @@ export const storeService = {
 
       const { data, error } = await query;
 
-      if (error || !data || data.length === 0) {
-        let filtered = [...MOCK_PRODUCTS];
-        if (categoryId) {
-          filtered = filtered.filter((p) => p.category_id === categoryId);
-        }
-        if (search && search.trim()) {
-          const s = search.toLowerCase();
-          filtered = filtered.filter(
-            (p) => p.name.toLowerCase().includes(s) || (p.description && p.description.toLowerCase().includes(s))
-          );
-        }
-        return filtered;
+      if (error) {
+        console.error("Error fetching products from Supabase:", error);
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        return [];
       }
 
       interface SupabaseProductQueryRow {

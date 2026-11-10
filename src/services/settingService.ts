@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const DEFAULT_OUTLET_ID = "e0000000-0000-0000-0000-000000000001";
 
@@ -88,8 +88,7 @@ export interface AllSettings {
 const SETTINGS_STORAGE_KEY = "foodpos_settings_v1";
 
 const isConfiguredSupabase = (): boolean => {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  return Boolean(url && !url.includes("placeholder-project"));
+  return isSupabaseConfigured();
 };
 
 export const getDefaultSettings = (outletId = DEFAULT_OUTLET_ID): AllSettings => ({
@@ -204,18 +203,37 @@ export const settingService = {
   async getAllSettings(outletId: string = DEFAULT_OUTLET_ID): Promise<AllSettings> {
     if (isConfiguredSupabase()) {
       try {
+        let targetOutletId = outletId;
+
+        // Verify primary outlet if provided ID is not found
+        let outletRes = await supabase
+          .from("outlets" as never)
+          .select("*")
+          .eq("id" as never, targetOutletId as never)
+          .maybeSingle();
+
+        if (!outletRes.data) {
+          const { data: firstOutlet } = await supabase
+            .from("outlets" as never)
+            .select("*")
+            .limit(1)
+            .maybeSingle();
+          if (firstOutlet) {
+            outletRes = { data: firstOutlet, error: null } as never;
+            targetOutletId = (firstOutlet as OutletInfo).id;
+          }
+        }
+
         const [
-          outletRes,
           storeRes,
           paymentRes,
           taxRes,
           scRes,
         ] = await Promise.all([
-          supabase.from("outlets" as never).select("*").eq("id" as never, outletId as never).maybeSingle(),
-          supabase.from("store_settings" as never).select("*").eq("outlet_id" as never, outletId as never).maybeSingle(),
-          supabase.from("payment_settings" as never).select("*").eq("outlet_id" as never, outletId as never).maybeSingle(),
-          supabase.from("tax_settings" as never).select("*").eq("outlet_id" as never, outletId as never).maybeSingle(),
-          supabase.from("service_charge_settings" as never).select("*").eq("outlet_id" as never, outletId as never).maybeSingle(),
+          supabase.from("store_settings" as never).select("*").eq("outlet_id" as never, targetOutletId as never).maybeSingle(),
+          supabase.from("payment_settings" as never).select("*").eq("outlet_id" as never, targetOutletId as never).maybeSingle(),
+          supabase.from("tax_settings" as never).select("*").eq("outlet_id" as never, targetOutletId as never).maybeSingle(),
+          supabase.from("service_charge_settings" as never).select("*").eq("outlet_id" as never, targetOutletId as never).maybeSingle(),
         ]);
 
         const local = loadSettingsFromStorage();
@@ -226,7 +244,7 @@ export const settingService = {
         const taxData = taxRes.data as unknown as TaxSettings | null;
         const scData = scRes.data as unknown as ServiceChargeSettings | null;
 
-        return {
+        const merged: AllSettings = {
           outlet: outletData
             ? {
                 id: outletData.id,
@@ -254,7 +272,7 @@ export const settingService = {
                 is_online_ordering_enabled: storeData.is_online_ordering_enabled,
                 updated_at: storeData.updated_at,
               }
-            : local.store,
+            : { ...local.store, outlet_id: targetOutletId },
           payment: paymentData
             ? {
                 id: paymentData.id,
@@ -270,7 +288,7 @@ export const settingService = {
                 is_card_enabled: paymentData.is_card_enabled,
                 updated_at: paymentData.updated_at,
               }
-            : local.payment,
+            : { ...local.payment, outlet_id: targetOutletId },
           tax: taxData
             ? {
                 id: taxData.id,
@@ -280,7 +298,7 @@ export const settingService = {
                 tax_name: taxData.tax_name,
                 updated_at: taxData.updated_at,
               }
-            : local.tax,
+            : { ...local.tax, outlet_id: targetOutletId },
           serviceCharge: scData
             ? {
                 id: scData.id,
@@ -289,9 +307,13 @@ export const settingService = {
                 service_rate_percent: Number(scData.service_rate_percent),
                 updated_at: scData.updated_at,
               }
-            : local.serviceCharge,
+            : { ...local.serviceCharge, outlet_id: targetOutletId },
           receipt: local.receipt,
         };
+
+        // Sync fresh database values back to local storage
+        saveSettingsToStorage(merged);
+        return merged;
       } catch (err) {
         console.warn("Supabase fetch settings failed, fallback to local storage:", err);
       }
@@ -322,27 +344,27 @@ export const settingService = {
       id: outletId,
     };
 
-    current.outlet = updatedOutlet;
-    saveSettingsToStorage(current);
-
     if (isConfiguredSupabase()) {
-      try {
-        await supabase
-          .from("outlets" as never)
-          .update({
-            code: updatedOutlet.code,
-            name: updatedOutlet.name,
-            address: updatedOutlet.address,
-            phone: updatedOutlet.phone,
-            is_active: updatedOutlet.is_active,
-            updated_at: new Date().toISOString(),
-          } as never)
-          .eq("id" as never, outletId as never);
-      } catch (err) {
-        console.warn("Supabase update outlets failed:", err);
+      const { error } = await supabase
+        .from("outlets" as never)
+        .update({
+          code: updatedOutlet.code,
+          name: updatedOutlet.name,
+          address: updatedOutlet.address,
+          phone: updatedOutlet.phone,
+          is_active: updatedOutlet.is_active,
+          updated_at: new Date().toISOString(),
+        } as never)
+        .eq("id" as never, outletId as never);
+
+      if (error) {
+        console.error("Supabase update outlets failed:", error);
+        throw new Error(`Gagal menyimpan identitas outlet ke database: ${error.message}`);
       }
     }
 
+    current.outlet = updatedOutlet;
+    saveSettingsToStorage(current);
     return updatedOutlet;
   },
 
@@ -369,33 +391,39 @@ export const settingService = {
       updated_at: new Date().toISOString(),
     };
 
-    current.store = updatedStore;
-    saveSettingsToStorage(current);
-
     if (isConfiguredSupabase()) {
-      try {
-        await supabase
-          .from("store_settings" as never)
-          .upsert({
-            outlet_id: outletId,
-            business_name: updatedStore.business_name,
-            business_tagline: updatedStore.business_tagline,
-            description: updatedStore.description,
-            logo_url: updatedStore.logo_url,
-            banner_url: updatedStore.banner_url,
-            operating_hours: updatedStore.operating_hours,
-            whatsapp_number: updatedStore.whatsapp_number,
-            email: updatedStore.email,
-            google_maps_url: updatedStore.google_maps_url,
-            estimated_prep_time_minutes: updatedStore.estimated_prep_time_minutes,
-            is_online_ordering_enabled: updatedStore.is_online_ordering_enabled,
-            updated_at: updatedStore.updated_at,
-          } as never, { onConflict: "outlet_id" } as never);
-      } catch (err) {
-        console.warn("Supabase update store_settings failed:", err);
+      const { data, error } = await supabase
+        .from("store_settings" as never)
+        .upsert({
+          outlet_id: outletId,
+          business_name: updatedStore.business_name,
+          business_tagline: updatedStore.business_tagline,
+          description: updatedStore.description,
+          logo_url: updatedStore.logo_url,
+          banner_url: updatedStore.banner_url,
+          operating_hours: updatedStore.operating_hours,
+          whatsapp_number: updatedStore.whatsapp_number,
+          email: updatedStore.email,
+          google_maps_url: updatedStore.google_maps_url,
+          estimated_prep_time_minutes: updatedStore.estimated_prep_time_minutes,
+          is_online_ordering_enabled: updatedStore.is_online_ordering_enabled,
+          updated_at: updatedStore.updated_at,
+        } as never, { onConflict: "outlet_id" } as never)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error("Supabase update store_settings failed:", error);
+        throw new Error(`Gagal menyimpan identitas restoran ke database: ${error.message}`);
+      }
+
+      if (data && (data as StoreSettings).id) {
+        updatedStore.id = (data as StoreSettings).id;
       }
     }
 
+    current.store = updatedStore;
+    saveSettingsToStorage(current);
     return updatedStore;
   },
 
@@ -422,31 +450,37 @@ export const settingService = {
       updated_at: new Date().toISOString(),
     };
 
-    current.payment = updatedPayment;
-    saveSettingsToStorage(current);
-
     if (isConfiguredSupabase()) {
-      try {
-        await supabase
-          .from("payment_settings" as never)
-          .upsert({
-            outlet_id: outletId,
-            qris_image_url: updatedPayment.qris_image_url,
-            qris_merchant_name: updatedPayment.qris_merchant_name,
-            bank_name: updatedPayment.bank_name,
-            bank_account_number: updatedPayment.bank_account_number,
-            bank_account_holder: updatedPayment.bank_account_holder,
-            is_cash_enabled: updatedPayment.is_cash_enabled,
-            is_qris_enabled: updatedPayment.is_qris_enabled,
-            is_transfer_enabled: updatedPayment.is_transfer_enabled,
-            is_card_enabled: updatedPayment.is_card_enabled,
-            updated_at: updatedPayment.updated_at,
-          } as never, { onConflict: "outlet_id" } as never);
-      } catch (err) {
-        console.warn("Supabase update payment_settings failed:", err);
+      const { data, error } = await supabase
+        .from("payment_settings" as never)
+        .upsert({
+          outlet_id: outletId,
+          qris_image_url: updatedPayment.qris_image_url,
+          qris_merchant_name: updatedPayment.qris_merchant_name,
+          bank_name: updatedPayment.bank_name,
+          bank_account_number: updatedPayment.bank_account_number,
+          bank_account_holder: updatedPayment.bank_account_holder,
+          is_cash_enabled: updatedPayment.is_cash_enabled,
+          is_qris_enabled: updatedPayment.is_qris_enabled,
+          is_transfer_enabled: updatedPayment.is_transfer_enabled,
+          is_card_enabled: updatedPayment.is_card_enabled,
+          updated_at: updatedPayment.updated_at,
+        } as never, { onConflict: "outlet_id" } as never)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error("Supabase update payment_settings failed:", error);
+        throw new Error(`Gagal menyimpan pengaturan pembayaran ke database: ${error.message}`);
+      }
+
+      if (data && (data as PaymentSettings).id) {
+        updatedPayment.id = (data as PaymentSettings).id;
       }
     }
 
+    current.payment = updatedPayment;
+    saveSettingsToStorage(current);
     return updatedPayment;
   },
 
@@ -473,25 +507,31 @@ export const settingService = {
       updated_at: new Date().toISOString(),
     };
 
-    current.tax = updatedTax;
-    saveSettingsToStorage(current);
-
     if (isConfiguredSupabase()) {
-      try {
-        await supabase
-          .from("tax_settings" as never)
-          .upsert({
-            outlet_id: outletId,
-            is_enabled: updatedTax.is_enabled,
-            tax_rate_percent: updatedTax.tax_rate_percent,
-            tax_name: updatedTax.tax_name,
-            updated_at: updatedTax.updated_at,
-          } as never, { onConflict: "outlet_id" } as never);
-      } catch (err) {
-        console.warn("Supabase update tax_settings failed:", err);
+      const { data, error } = await supabase
+        .from("tax_settings" as never)
+        .upsert({
+          outlet_id: outletId,
+          is_enabled: updatedTax.is_enabled,
+          tax_rate_percent: updatedTax.tax_rate_percent,
+          tax_name: updatedTax.tax_name,
+          updated_at: updatedTax.updated_at,
+        } as never, { onConflict: "outlet_id" } as never)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error("Supabase update tax_settings failed:", error);
+        throw new Error(`Gagal menyimpan pengaturan pajak ke database: ${error.message}`);
+      }
+
+      if (data && (data as TaxSettings).id) {
+        updatedTax.id = (data as TaxSettings).id;
       }
     }
 
+    current.tax = updatedTax;
+    saveSettingsToStorage(current);
     return updatedTax;
   },
 
@@ -518,24 +558,30 @@ export const settingService = {
       updated_at: new Date().toISOString(),
     };
 
-    current.serviceCharge = updatedSc;
-    saveSettingsToStorage(current);
-
     if (isConfiguredSupabase()) {
-      try {
-        await supabase
-          .from("service_charge_settings" as never)
-          .upsert({
-            outlet_id: outletId,
-            is_enabled: updatedSc.is_enabled,
-            service_rate_percent: updatedSc.service_rate_percent,
-            updated_at: updatedSc.updated_at,
-          } as never, { onConflict: "outlet_id" } as never);
-      } catch (err) {
-        console.warn("Supabase update service_charge_settings failed:", err);
+      const { data, error } = await supabase
+        .from("service_charge_settings" as never)
+        .upsert({
+          outlet_id: outletId,
+          is_enabled: updatedSc.is_enabled,
+          service_rate_percent: updatedSc.service_rate_percent,
+          updated_at: updatedSc.updated_at,
+        } as never, { onConflict: "outlet_id" } as never)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error("Supabase update service_charge_settings failed:", error);
+        throw new Error(`Gagal menyimpan pengaturan service charge ke database: ${error.message}`);
+      }
+
+      if (data && (data as ServiceChargeSettings).id) {
+        updatedSc.id = (data as ServiceChargeSettings).id;
       }
     }
 
+    current.serviceCharge = updatedSc;
+    saveSettingsToStorage(current);
     return updatedSc;
   },
 

@@ -15,7 +15,7 @@
 | **Phase 0** | Fondasi Project (React 18 + TS + Vite + Tailwind + shadcn tokens + HashRouter) | ✅ Selesai | 3 tests |
 | **Phase 1** | PostgreSQL Database Schema (28 tabel, 12 migrasi, RLS, Storage, Bootstrap) | ✅ Selesai | 5 tests |
 | **Phase 2** | Toko Publik & Pelacakan (Katalog, Keranjang Zustand, PB1, 256-bit Token CSPRNG) | ✅ Selesai | 9 tests |
-| **Phase 3** | Backoffice & Auth RBAC (Zustand Store, Supabase Auth, ProtectedRoute, 403) | ✅ Selesai | 8 tests |
+| **Phase 3** | Backoffice & Auth RBAC (Zustand Store, Supabase Auth, ProtectedRoute, 403) | ✅ Selesai | 14 tests |
 | **Phase 4** | Manajemen Pesanan & Kanban Dapur (dnd-kit, FSM Status, Web Audio Chime, Thermal Print) | ✅ Selesai | 15 tests |
 | **Phase 5** | Kasir POS (Fast Grid, Varian & Addons, Parkir Tagihan/Hold Bill, Kembalian Tunai) | ✅ Selesai | 13 tests |
 | **Phase 6** | Katalog Menu & Kategori (CRUD Kategori Auto-slug, Produk SKU unik, Availability Toggle) | ✅ Selesai | 17 tests |
@@ -23,11 +23,11 @@
 | **Phase 8** | Pembayaran, Verifikasi & Keuangan Kasir (Transfer Verification, Dual-Custody Refund, Shift Kasir) | ✅ Selesai | 20 tests |
 | **Phase 9** | Manajemen Pelanggan (Direktori Pelanggan, Proteksi Hapus Riwayat, Metrik LTV/AOV) | ✅ Selesai | 13 tests |
 | **Phase 10** | Analitik Penjualan & Laporan (4 KPI, 4 Visualisasi Recharts, Peak Hours, Ekspor CSV) | ✅ Selesai | 12 tests |
-| **Phase 11** | Pengaturan Restoran & Sistem (Tarif PB1 & Simulasi Dinamis, QRIS, Live Thermal Preview) | ✅ Selesai | 14 tests |
+| **Phase 11** | Pengaturan Restoran & Sistem (Tarif PB1 & Simulasi Dinamis, QRIS, Live Thermal Preview) | ✅ Selesai | 16 tests |
 | **Phase 12** | Log Audit, Keamanan & Notifikasi (Sanitasi Password, CSV Audit, Lonceng Topbar, Modal JSON) | ✅ Selesai | 8 tests |
 | **Phase 13** | Multi-Outlet & UI Polish (Outlet Switcher, Ketahanan Offline/Online, React Error Boundary) | ✅ Selesai | 9 tests |
 | **Phase 14** | E2E Testing, CI/CD Pages Deployment & Dokumentasi Rilis v1.0.0 | ✅ Selesai | 4 tests |
-| **TOTAL** | **15 Fase Pengembangan Penuh** | **100% Selesai** | **164 Tests** |
+| **TOTAL** | **15 Fase Pengembangan Penuh** | **100% Selesai** | **172 Tests** |
 
 ---
 

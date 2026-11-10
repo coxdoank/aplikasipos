@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.2] - 2026-11-10
+### Store Settings Persistence Fix, RLS Policies & Operational Data Cleanup
+
+#### Fixed
+- **Persistensi Pengaturan Toko & Identitas Merek Restoran:**
+  - Menemukan dan memperbaiki akar masalah pada database: Menjalankan migration `20261110000001_fix_grants_and_settings_rls.sql` untuk memberikan `GRANT` hak akses schema public ke role PostgREST API (`anon`, `authenticated`, `service_role`).
+  - Menambahkan RLS Policy `INSERT` pada tabel `store_settings`, `payment_settings`, `tax_settings`, dan `service_charge_settings` agar operasi `UPSERT` diizinkan oleh PostgreSQL.
+  - Menambahkan RLS Policy `UPDATE` dan `INSERT` pada tabel `outlets` agar pengelola restoran dapat memperbarui detail outlet fisik.
+  - Memperbaiki `src/services/settingService.ts` untuk memeriksa error database secara ketat (tidak lagi menelan error secara diam-diam) dan melakukan sinkronisasi cache dua arah.
+  - Memperbarui `src/modules/settings/pages/SettingsPage.tsx` agar membaca ulang data terverifikasi dari Supabase setelah tombol simpan ditekan, serta menggunakan ID outlet aktif secara konsisten.
+  - Menambahkan unit test di `tests/unit/phase11_settings.test.tsx` untuk menguji persistensi perubahan identitas merek dan verifikasi banner error jika koneksi gagal.
+
+#### Changed
+- **Pembersihan Data Operasional untuk Setup Awal Restoran:**
+  - Memverifikasi tabel operasional di database Supabase Cloud (`products`, `categories`, `orders`, `order_items`, `order_payments`, `stock_movements`, `cash_sessions`, `expenses`) yang telah bersih (0 rows).
+  - Melakukan reset pada tabel `audit_logs` agar pencatatan jejak audit dimulai segar dari awal setup restoran.
+  - Memperbarui `src/services/storeService.ts` agar tidak mengembalikan data dummy / mock catalog ketika database Supabase aktif dan dalam kondisi bersih untuk setup awal.
+  - Mempertahankan 100% data akun Supabase Auth, profiles, roles, permissions, user_roles, user_outlets, outlets, dan aset branding QRIS.
+
+---
+
 ## [1.0.1] - 2026-11-10
 ### Production Hardening, GitHub Deployment & Demo Login Elimination
 

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
+import { outletService } from "@/services/outletService";
 import {
   settingService,
   type AllSettings,
@@ -46,7 +47,8 @@ export const SettingsPage: React.FC = () => {
     const fetchSettings = async () => {
       setIsLoading(true);
       try {
-        const data = await settingService.getAllSettings();
+        const activeOutletId = outletService.getActiveOutletId();
+        const data = await settingService.getAllSettings(activeOutletId);
         if (isMounted) {
           setSettings(data);
         }
@@ -78,7 +80,7 @@ export const SettingsPage: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      const outletId = settings.outlet.id;
+      const outletId = settings.outlet.id || outletService.getActiveOutletId();
       await Promise.all([
         settingService.updateOutletInfo(outletId, settings.outlet),
         settingService.updateStoreSettings(outletId, settings.store),
@@ -87,6 +89,10 @@ export const SettingsPage: React.FC = () => {
         settingService.updateServiceChargeSettings(outletId, settings.serviceCharge),
         settingService.updateReceiptSettings(outletId, settings.receipt),
       ]);
+
+      // Re-read latest verified data from Supabase to refresh state
+      const refreshed = await settingService.getAllSettings(outletId);
+      setSettings(refreshed);
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
