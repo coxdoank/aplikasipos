@@ -85,6 +85,7 @@ FOODPOS/
 - **Phase 3:** Backoffice & Autentikasi RBAC (Zustand Auth Store, Proteksi Rute `ProtectedRoute`, 403 Forbidden, Demo Staff accounts, Dashboard KPI).
 - **Phase 4:** Manajemen Pesanan & Kanban (Papan Kanban Drag-and-Drop, FSM Status Mesin, Riwayat Audit Perjalanan Status, Notifikasi Audio Chime Web Audio API, Modal Detail Pesanan Komprehensif, Dialog Pembatalan Aman, Pratinjau Cetak Struk Kasir Termal 58/80mm).
 - **Phase 5:** Antarmuka Kasir POS (Fast-checkout Grid, Kustomisasi Varian & Topping, Pemilihan Meja & Tipe Layanan, Diskon & PB1 10%, Fitur Tahan Pesanan/Hold Bill, Modal Pembayaran Multi-Metode Tunai/QRIS/EDC, Validasi Kembalian, dan Cetak Struk Instan).
+- **Phase 6:** Manajemen Produk, Kategori & Katalog Menu (CRUD Kategori dengan Auto-slug & Proteksi Hapus, CRUD Menu Hidangan dengan SKU Unik & Zod Form, Pengelolaan Dinamis Varian Porsi & Topping Tambahan, Toggle Cepat Ketersediaan Dapur Tersedia/Habis, dan Kontrol Hak Akses `products.manage`).
 
 ---
 

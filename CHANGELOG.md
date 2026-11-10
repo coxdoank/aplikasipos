@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2026-11-10
+### Phase 6 — Product, Category, and Catalog Management
+
+#### Added
+- **Service Layer Manajemen Katalog (`src/services/catalogService.ts`):**
+  - CRUD Kategori dengan auto-slug generator dan proteksi pencegahan penghapusan kategori berproduk.
+  - CRUD Produk Menu dengan validasi kode SKU unik, relasi kategori, deskripsi, dan stok fisik.
+  - Pengelolaan dinamis varian porsi (`ProductVariantItem`) dan topping add-on (`ProductAddonItem`).
+  - Toggle cepat 1-klik untuk status ketersediaan dapur (*Tersedia / Habis*) dan status visibilitas menu (*Aktif / Nonaktif*).
+  - Sinkronisasi persistensi ganda (`localStorage` dan Supabase PostgreSQL).
+- **Halaman Manajemen Kategori Menu (`CategoriesPage.tsx` & `CategoryModal.tsx`):**
+  - Tabel kategori dengan urutan prioritas tampilan, badge slug, jumlah produk terhubung, dan status aktif.
+  - Form modal pembuatan/pengubahan kategori dengan validasi Zod & React Hook Form.
+- **Halaman Katalog Produk & Menu Backoffice (`ProductsPage.tsx` & `ProductModal.tsx`):**
+  - Ringkasan KPI: Total Menu, Menu Aktif, Menu Tersedia, dan Menu Habis.
+  - Toolbar pencarian nama/SKU, filter kategori menu, filter ketersediaan dapur, dan opsi pengurutan (A-Z, Harga Rendah/Tinggi).
+  - Modal form produk 3 tab: Informasi & Stok, Varian Porsi, dan Topping / Add-on.
+  - Tombol reset katalog default untuk pengujian operasional.
+  - Proteksi otorisasi berbasis wewenang `products.view` dan `products.manage`.
+- **Pengujian Unit & Integrasi Phase 6 (`tests/unit/phase6_catalog.test.tsx`):**
+  - 17 pengujian menyeluruh untuk validasi integritas katalog, penolakan SKU duplikat, dan interaksi form UI.
+
+---
+
 ## [0.6.0] - 2026-11-10
 ### Phase 5 — Point of Sale (POS) Cashier Interface
 
