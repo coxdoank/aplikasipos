@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-11-10
+### Phase 5 — Point of Sale (POS) Cashier Interface
+
+#### Added
+- **State Management Kasir POS (`src/stores/posStore.ts`):**
+  - Penyimpanan keranjang kasir terisolasi di `localStorage` dengan penanganan composite key.
+  - Pengaturan info pelanggan, nomor meja (*Meja 01 - 10, Bar, VIP, Outdoor*), dan tipe layanan (*Dine-in, Takeaway, Delivery, Pickup*).
+  - Perhitungan diskon multi-tipe (persentase & nominal), Pajak Restoran PB1 (10%), dan Grand Total.
+  - Fitur **Tahan & Lanjutkan Pesanan (*Hold Bill / Parked Carts*)** untuk fleksibilitas antrean kasir.
+- **Grid Menu Cepat Kasir (`PosProductGrid.tsx`):**
+  - Filter kategori responsif, pencarian cepat nama/SKU, dan deteksi kustomisasi varian.
+- **Modal Kustomisasi Varian & Add-on (`PosItemModal.tsx`):**
+  - Pemilihan varian porsi, topping tambahan, catatan koki, dan perhitungan instan harga item.
+- **Modal Pengaturan Meja & Tamu (`PosCustomerModal.tsx`):**
+  - Modal cepat pengaturan nama pemesan, nomor HP, nomor meja, dan catatan umum pesanan.
+- **Modal Antrean Pesanan Ditahan (`PosParkedBillsModal.tsx`):**
+  - Daftar transaksi yang sedang diparkir dengan opsi *Resume* dan *Delete*.
+- **Modal Pembayaran Kasir POS Komprehensif (`PosPaymentModal.tsx`):**
+  - Mode Tunai (Cash) dengan kalkulator uang kertas (+10k, +20k, +50k, +100k, Uang Pas) dan validasi kembalian.
+  - Mode QRIS dengan simulasi visual QR Code dan verifikasi nomor transaksi.
+  - Mode Mesin EDC / Kartu Debit & Kredit dengan approval code.
+  - Mode Transfer Bank dengan rekening kasir.
+  - Registrasi pesanan resmi ke antrean dapur berstatus `PROCESSING` dan pembayaran `PAID`.
+- **Modal Umpan Balik Sukses Kasir (`PosSuccessModal.tsx`):**
+  - Tampilan kembalian pelanggan, pencetakan struk fisik termal 58/80mm, dan tombol pesanan baru.
+- **Pengujian Unit & Integrasi Phase 5 (`tests/unit/phase5_pos.test.tsx`):**
+  - 13 pengujian menyeluruh untuk kalkulasi diskon/pajak, Hold & Resume, interaksi kasir, dan pembayaran.
+
+---
+
 ## [0.5.0] - 2026-11-09
 ### Phase 4 — Order Management and Kanban
 

@@ -1,73 +1,80 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 4 — Order Management and Kanban
+## Current Phase: PHASE 5 — Point of Sale (POS) Cashier Interface
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 4)
-- [x] **Service Layer Pesanan (`src/services/orderService.ts`):**
-  - Implementasi Finite State Machine (FSM) yang ketat untuk transisi status pesanan:
-    - Maju: `NEW` -> `PROCESSING` -> `READY` -> `COMPLETED`.
-    - Pembatalan: `NEW` -> `CANCELLED`, `PROCESSING` -> `CANCELLED`, `READY` -> `CANCELLED` (memerlukan alasan pembatalan wajib & hak akses).
-    - Status terminal: `COMPLETED` dan `CANCELLED` dikunci secara permanen.
-  - Pencatatan otomatis ke riwayat audit perjalanan status (`order_status_history`) mencakup status lama, status baru, nama operator, alasan, dan timestamp.
-  - Dukungan filter pencarian (`search`), status pesanan, saluran (`channel`), jenis layanan (`service_type`), dan pengurutan (`newest` / `oldest`).
-  - Perhitungan statistik ringkasan antrean pesanan (`getOrdersSummary`).
-  - Generator nada notifikasi dapur restoran (*Kitchen Chime Alert*) menggunakan Web Audio API tanpa ketergantungan berkas audio eksternal.
-  - Sinkronisasi instan pesanan dari toko online publik (`storeService.ts`) langsung ke daftar pesanan backoffice.
-- [x] **Tampilan Papan Kanban Interaktif (`OrderKanban.tsx`):**
-  - 4 kolom status utama: *Pesanan Baru (NEW)*, *Sedang Dimasak (PROCESSING)*, *Siap Saji / Kirim (READY)*, dan *Selesai (COMPLETED)*.
-  - Drag-and-drop antar kolom status dengan validasi FSM otomatis.
-  - Tombol aksi 1-klik untuk perangkat sentuh / tablet / kasir: "Masak", "Siap", "Selesai".
-  - Kartu pesanan kaya informasi: nomor order, waktu berlalu (*elapsed time* dengan penanda urgensi jika > 20 mnt), saluran (`ONLINE` / `POS`), tipe layanan (`DINE_IN`, `DELIVERY`, dll), ringkasan item, total tagihan, dan tombol pembatalan cepat.
-- [x] **Tampilan Tabel Responsif (`OrdersPage.tsx`):**
-  - Toggle pergantian tampilan: Mode Papan Kanban vs Mode Tabel Data.
-  - Kartu KPI metrik interaktif yang juga berfungsi sebagai tombol filter cepat status pesanan.
-  - Toolbar pencarian fleksibel dan dropdown penyaringan multi-dimensi (saluran, tipe layanan, waktu).
-  - Saklar notifikasi audio (*sound alert toggle*).
-  - Pengecekan *polling* berkala (setiap 10 detik) untuk mendeteksi pesanan online baru dengan *kitchen chime* dan *toast notification*.
-- [x] **Modal Detail Pesanan Komprehensif (`OrderDetailModal.tsx`):**
-  - Pratinjau lengkap informasi pelanggan, nomor WhatsApp dengan tautan langsung, alamat pengantaran, dan catatan khusus.
-  - Rincian hidangan: varian, *topping/addons*, catatan per item masakan, kuantitas, harga satuan, dan subtotal.
-  - Rincian finansial: subtotal, pajak resto PB1 (10%), ongkos kirim, dan grand total.
-  - Informasi pembayaran: metode (QRIS, Tunai, Transfer Bank, EDC Debit), status lunas, nomor referensi TRX, dan uang kembalian.
-  - *Vertical Stepper Timeline* yang menampilkan seluruh riwayat perubahan status beserta nama staf dan alasan.
-  - Tombol aksi cetak struk kasir dan tombol eksekusi status berikutnya.
-- [x] **Dialog Pembatalan Pesanan Aman (`CancelOrderDialog.tsx`):**
-  - Otorisasi berbasis hak akses: memvalidasi izin `orders.cancel` (hanya Admin/Owner).
-  - Validasi alasan pembatalan wajib dengan pilihan alasan cepat (*preset*) dan masukan teks spesifik.
-  - Konfirmasi peringatan sebelum eksekusi pembatalan.
-- [x] **Pratinjau Cetak Struk Kasir Termal (`ReceiptPrintModal.tsx`):**
-  - Format struk restoran termal 58mm/80mm siap cetak (`window.print()`).
-  - Lengkap dengan identitas resto, nomor order, daftar item terperinci, rincian pajak & total, serta metode pembayaran.
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 5)
+- [x] **State Management Kasir POS (`src/stores/posStore.ts`):**
+  - Penyimpanan keranjang kasir terisolasi dengan persistensi `localStorage`.
+  - Dukungan composite item kasir (produk, varian hidangan, pilihan add-on/topping, instruksi dapur, kuantitas).
+  - Pengaturan data pelanggan & meja: Nama tamu ("Tamu Kasir"), nomor HP, pemilihan nomor meja (*Meja 01 - 10, Bar, VIP, Outdoor*), dan tipe layanan (*Dine-in, Takeaway, Delivery, Pickup*).
+  - Perhitungan diskon multi-tipe: persentase (0%, 5%, 10%, 15%, 20%) atau potongan nominal tetap (Rp).
+  - Perhitungan otomatis subtotal, diskon, Pajak Restoran PB1 (10% atas nilai setelah diskon), dan grand total.
+  - Fitur **Tahan & Lanjutkan Pesanan (*Hold Bill / Parked Carts*)**: menahan pesanan pelanggan untuk melayani pelanggan berikutnya, serta memuat kembali (*resume*) atau menghapus pesanan yang diparkir.
+- [x] **Grid Menu Cepat Kasir (`PosProductGrid.tsx`):**
+  - Filter kategori menu hidangan responsif (*Semua, Makanan Utama, Minuman, Snack, Paket Hemat*).
+  - Pencarian instan berdasarkan nama produk atau kode SKU.
+  - Kartu produk informatif dengan harga dasar, badge stok fisik, dan tombol tambah cepat (+).
+  - Deteksi otomatis: hidangan bervarian/topping akan membuka modal kustomisasi, sedangkan produk reguler langsung masuk ke keranjang dengan 1 klik.
+- [x] **Modal Opsi Varian & Topping (`PosItemModal.tsx`):**
+  - Pemilihan varian porsi (*radio button* dengan penyesuaian harga).
+  - Pemilihan topping/addon tambahan (*checkbox* dengan tambahan harga).
+  - Catatan khusus koki/dapur per item masakan.
+  - Stepper kuantitas porsi dan kalkulasi langsung harga total item.
+- [x] **Panel Keranjang & Pembayaran Cepat (`PosCartPanel.tsx`):**
+  - Ringkasan tamu dan nomor meja yang dapat diubah secara instan.
+  - Tab pengubah tipe layanan 1-klik (*Dine-in, Takeaway, Delivery, Pickup*).
+  - Daftar baris pesanan dengan stepper ubah kuantitas (- / +), catatan per item, dan tombol hapus.
+  - Tombol pintas diskon cepat dan masukan diskon nominal.
+  - Rincian finansial akurat: Subtotal, Diskon, Pajak Restoran PB1 (10%), dan Grand Total.
+  - Tombol **Tahan Pesanan (Hold Bill)** dan tombol **Bayar Sekarang**.
+- [x] **Modal Pembayaran Kasir Komprehensif (`PosPaymentModal.tsx`):**
+  - **Pembayaran Tunai (Cash):**
+    - Kalkulator nominal cepat uang kertas (+10k, +20k, +50k, +100k, Uang Pas, Reset).
+    - Validasi pembayaran penuh (*Single Full Payment Rule*) dan perhitungan kembalian realtime (indikator hijau jika cukup, merah jika kurang).
+  - **Pembayaran QRIS:**
+    - Tampilan kode QRIS restoran dinamis dengan panduan scan e-wallet & m-banking, serta verifikasi nomor transaksi.
+  - **Pembayaran EDC / Kartu Debit & Kredit:**
+    - Pilihan bank mesin EDC (*BCA, Mandiri, BRI, BNI*) dan masukan kode persetujuan (*Approval Code / Trace No.*).
+  - **Pembayaran Transfer Bank:**
+    - Nomor rekening resmi kasir dan konfirmasi nomor referensi.
+  - Pembuatan order kasir resmi dengan saluran `POS`, status `PROCESSING` (langsung diteruskan ke antrean dapur), dan status pembayaran `PAID`.
+  - Suara notifikasi dapur (*kitchen chime*) saat pesanan kasir berhasil diselesaikan.
+- [x] **Modal Konfirmasi & Cetak Struk Sukses (`PosSuccessModal.tsx`):**
+  - Tampilan umpan balik transaksi kasir sukses dengan nomor order resmi.
+  - Rincian uang diterima dan nominal kembalian pelanggan.
+  - Tombol cetak struk termal kasir 58/80mm ([`ReceiptPrintModal`](file:///D:/Projects/FOODPOS/src/modules/orders/components/ReceiptPrintModal.tsx)).
+  - Tombol pesanan baru untuk transaksi berikutnya dan tautan cepat ke antrean dapur.
 - [x] **Pengujian & Kualitas:**
-  - 38 unit & integration tests lulus di 6 test suites (`tests/unit/phase4_orders.test.tsx` dkk).
+  - 51 unit & integration tests lulus di 7 test suites (`tests/unit/phase5_pos.test.tsx` dkk).
   - ESLint 0 errors, 0 warnings.
   - Kompilasi produksi TypeScript & Vite sukses.
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 4. Seluruh acceptance criteria telah terpenuhi.
+- Tidak ada untuk Phase 5. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/services/orderService.ts`
-- `src/modules/orders/components/OrderKanban.tsx`
-- `src/modules/orders/components/OrderDetailModal.tsx`
-- `src/modules/orders/components/CancelOrderDialog.tsx`
-- `src/modules/orders/components/ReceiptPrintModal.tsx`
-- `tests/unit/phase4_orders.test.tsx`
+- `src/stores/posStore.ts`
+- `src/modules/pos/components/PosCustomerModal.tsx`
+- `src/modules/pos/components/PosItemModal.tsx`
+- `src/modules/pos/components/PosProductGrid.tsx`
+- `src/modules/pos/components/PosParkedBillsModal.tsx`
+- `src/modules/pos/components/PosPaymentModal.tsx`
+- `src/modules/pos/components/PosSuccessModal.tsx`
+- `src/modules/pos/components/PosCartPanel.tsx`
+- `tests/unit/phase5_pos.test.tsx`
 
 #### Dimodifikasi:
-- `src/modules/orders/pages/OrdersPage.tsx`
-- `src/services/storeService.ts`
-- `src/types/database.types.ts`
+- `src/modules/pos/pages/PosPage.tsx`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -82,18 +89,19 @@
   - `tests/unit/phase2_ui_integration.test.tsx` (4 passed)
   - `tests/unit/phase3_auth_backoffice.test.tsx` (6 passed)
   - `tests/unit/phase4_orders.test.tsx` (15 passed)
-  - Total: **38 passed, 0 failed**.
+  - `tests/unit/phase5_pos.test.tsx` (13 passed)
+  - Total: **51 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-CdLcO1TI.js` (659.57 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-fy9sVIQi.js` (701.22 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 4.
+- Tidak ada issue tersisa pada Phase 5.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 5 — Point of Sale (POS) Cashier Interface**
+- **PHASE 6 — Product, Category, and Catalog Management**
