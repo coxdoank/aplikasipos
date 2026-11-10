@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2026-11-10
+### Production Hardening, GitHub Deployment & Demo Login Elimination
+
+#### Changed
+- **Eliminasi Total Akun & Fitur Demo:**
+  - Menghapus komponen "Akun Demo Cepat (Simulator)" dan tombol `OWNER`, `ADMIN`, `CASHIER` dari halaman login.
+  - Menghapus handler autofill dan kredensial hardcoded `DEMO_STAFF_ACCOUNTS`.
+  - Mewajibkan autentikasi login 100% melalui `Supabase Auth` dengan pemetaan izin RBAC tabel backend PostgreSQL (`profiles`, `user_roles`, `role_permissions`).
+  - Memperbarui suite pengujian autentikasi `tests/unit/phase3_auth_backoffice.test.tsx` (8 passed) guna memastikan tidak ada celah bypass login demo.
+- **Branding & Asset Produksi:**
+  - Menambahkan branded SVG favicon pada `public/favicon.svg` untuk menghilangkan error 404 `vite.svg`.
+  - Memperkaya `index.html` dengan metadata SEO, Open Graph tags, dan tema warna sistem.
+- **Workflow Deployment GitHub Actions:**
+  - Memperbarui `.github/workflows/deploy.yml` untuk mendukung `secrets` maupun `vars` untuk `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`.
+
+---
+
 ## [1.0.0] - 2026-11-10
 ### Phase 14 — E2E Testing, CI/CD GitHub Pages Deployment & Final System Documentation (Production Release)
 

@@ -15,7 +15,7 @@
 | **Phase 0** | Fondasi Project (React 18 + TS + Vite + Tailwind + shadcn tokens + HashRouter) | ✅ Selesai | 3 tests |
 | **Phase 1** | PostgreSQL Database Schema (28 tabel, 12 migrasi, RLS, Storage, Bootstrap) | ✅ Selesai | 5 tests |
 | **Phase 2** | Toko Publik & Pelacakan (Katalog, Keranjang Zustand, PB1, 256-bit Token CSPRNG) | ✅ Selesai | 9 tests |
-| **Phase 3** | Backoffice & Auth RBAC (Zustand Store, Demo Accounts, ProtectedRoute, 403) | ✅ Selesai | 6 tests |
+| **Phase 3** | Backoffice & Auth RBAC (Zustand Store, Supabase Auth, ProtectedRoute, 403) | ✅ Selesai | 8 tests |
 | **Phase 4** | Manajemen Pesanan & Kanban Dapur (dnd-kit, FSM Status, Web Audio Chime, Thermal Print) | ✅ Selesai | 15 tests |
 | **Phase 5** | Kasir POS (Fast Grid, Varian & Addons, Parkir Tagihan/Hold Bill, Kembalian Tunai) | ✅ Selesai | 13 tests |
 | **Phase 6** | Katalog Menu & Kategori (CRUD Kategori Auto-slug, Produk SKU unik, Availability Toggle) | ✅ Selesai | 17 tests |
@@ -27,7 +27,7 @@
 | **Phase 12** | Log Audit, Keamanan & Notifikasi (Sanitasi Password, CSV Audit, Lonceng Topbar, Modal JSON) | ✅ Selesai | 8 tests |
 | **Phase 13** | Multi-Outlet & UI Polish (Outlet Switcher, Ketahanan Offline/Online, React Error Boundary) | ✅ Selesai | 9 tests |
 | **Phase 14** | E2E Testing, CI/CD Pages Deployment & Dokumentasi Rilis v1.0.0 | ✅ Selesai | 4 tests |
-| **TOTAL** | **15 Fase Pengembangan Penuh** | **100% Selesai** | **162 Tests** |
+| **TOTAL** | **15 Fase Pengembangan Penuh** | **100% Selesai** | **164 Tests** |
 
 ---
 
