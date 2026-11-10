@@ -1,55 +1,58 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 10 — Backoffice Analytics, Reports, and Business Insights
+## Current Phase: PHASE 11 — Settings & System Configuration
 
 ### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
 
 ---
 
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 10)
-- [x] **Service Layer Analitik & Laporan Bisnis (`src/services/reportService.ts`):**
-  - **Kalkulasi Metrik Penjualan & Pajak:**
-    - Perhitungan metrik berdasarkan rentang tanggal: Penjualan Bersih (*Net Sales* = Omset Bruto dikurangi Pajak PB1), Total Pesanan Selesai (*Completed Orders*), Rata-rata Nilai Transaksi (*Average Order Value / AOV*), dan Akumulasi Pajak PB1 10%.
-  - **Visualisasi Tren & Pola Penjualan:**
-    - Tren penjualan harian (`getDailySalesTrend`) menyajikan riwayat omset per tanggal dalam rentang filter.
-    - Analisis jam operasional sibuk (*Peak Dining Hours*) restoran (`getHourlySalesTrend`) dari pukul 08:00 hingga 21:00 untuk optimalisasi shift pegawai.
-  - **Peringkat Menu & Kontribusi Pendapatan:**
-    - Pemeringkatan 10 produk menu terlaris (`getTopSellingProducts`) berdasarkan kuantitas item terjual, akumulasi rupiah omset, dan persentase kontribusi terhadap total menu terjual.
-  - **Analisis Segmentasi Saluran & Pembayaran:**
-    - Komposisi saluran transaksi (`getChannelBreakdown`): Perbandingan persentase pesanan kasir POS (Dine-in & Takeaway) dengan pesanan mandiri online (Pickup & Delivery).
-    - Komposisi metode pembayaran (`getPaymentMethodBreakdown`): Tunai, QRIS statis, Transfer Bank manual, dan Kartu Debit/Kredit EDC.
-  - **Ekspor Data & Pelaporan:**
-    - Generator CSV (`generateCSV`) dengan sanitasi nilai teks, koma, kutip dua, dan header laporan yang siap diunduh secara aman di lingkungan browser.
-- [x] **Halaman Dashboard Laporan & Analitik (`src/modules/reports/pages/ReportsPage.tsx`):**
-  - Pemilihan rentang waktu interaktif (Hari Ini, 7 Hari Terakhir, 30 Hari Terakhir, Bulan Ini, dan Semua Riwayat).
-  - 4 Kartu KPI Ringkasan Penjualan Eksekutif: Penjualan Bersih, Pesanan Selesai, Nilai Rata-rata Pesanan (AOV), dan Setoran Pajak PB1 10%.
-  - 4 Visualisasi Grafik Interaktif Recharts:
-    1. *BarChart*: Tren Penjualan Harian dengan tooltips format mata uang Rupiah.
-    2. *LineChart*: Frekuensi Transaksi Jam Sibuk (*Peak Hours*).
-    3. *PieChart / Donut*: Distribusi Metode Pembayaran Pelanggan.
-    4. *Channel Progress Bar*: Komparasi Proporsi Kanal POS Kasir vs Pesanan Online.
-  - Tabel Peringkat Menu Terlaris (*Top 10 Selling Products*) lengkap dengan visual bar kontribusi dan status ketersediaan inventori.
-  - Tombol Ekspor CSV dan Tombol Cetak Laporan (`window.print()`).
+### 1. Pekerjaan Selesai (Completed Tasks - Phase 11)
+- [x] **Service Layer Pengaturan & Konfigurasi Toko (`src/services/settingService.ts`):**
+  - **Manajemen Agregasi Konfigurasi Toko:**
+    - Penarikan terpadu 6 entitas konfigurasi sistem: Profil Outlet (`outlets`), Data Operasional Toko (`store_settings`), Pembayaran (`payment_settings`), Pajak Restoran PB1 (`tax_settings`), Biaya Layanan (`service_charge_settings`), dan Template Struk Kasir (`receipt`).
+    - Penyimpanan lokal berstruktur (*localStorage fallback*) yang otomatis tersinkronisasi jika backend Supabase terhubung.
+    - Fungsi pemulihan ke nilai bawaan pabrik (`resetToDefaults`).
+  - **Pembaruan Modular per Domain:**
+    - `updateOutletInfo`: Kode outlet, nama, alamat, telepon, dan status aktif.
+    - `updateStoreSettings`: Nama brand, slogan, deskripsi, tautan logo, banner, jam buka, estimasi waktu masak, sakelar penerimaan pesanan online, dan kontak WhatsApp.
+    - `updatePaymentSettings`: Sakelar aktivasi metode Tunai, QRIS, Transfer Bank, dan EDC Kartu, serta nomor rekening dan nama merchant QRIS.
+    - `updateTaxSettings`: Sakelar pajak daerah PB1, nama label pajak pada struk, dan tarif persentase pajak.
+    - `updateServiceChargeSettings`: Sakelar biaya layanan dan tarif persentase service charge.
+    - `updateReceiptSettings`: Header struk, sub-header alamat/telepon, footer ucapan, lebar kertas printer (58mm/80mm), sakelar rincian pajak, dan kredensial Wi-Fi pengunjung (SSID & Password).
+- [x] **Halaman Pengaturan Backoffice (`src/modules/settings/pages/SettingsPage.tsx`):**
+  - **Header & Kontrol Tindakan:** Tombol Simpan Pengaturan dengan animasi loading/sukses, serta tombol Reset Bawaan dengan konfirmasi keamanan.
+  - **4 Tab Navigasi Terstruktur:**
+    1. *Profil Outlet & Restoran*: Identitas brand, data fisik outlet, jam operasional, estimasi waktu penyajian, dan sakelar buka/tutup toko online.
+    2. *Pajak PB1 & Service Charge*: Pengaturan kepatuhan pajak daerah PB1 (10%) dan service charge dilengkapi kotak **Simulasi Kalkulasi Transaksi Dinamis** (contoh belanja Rp 100.000).
+    3. *Metode Pembayaran*: Seleksi 4 kanal pembayaran dan form rekening bank serta pratinjau kartu QRIS.
+    4. *Struk & Printer POS*: Kontrol template cetak thermal kasir yang berdampingan dengan **Live Thermal Receipt Preview** (struk belanja virtual interaktif bergaya thermal dengan efek robekan zigzag).
+  - **Enforcement Otorisasi Berbasis Izin (`settings.manage`):**
+    - Pengecekan izin granular via `useAuthStore`.
+    - Kru kasir dibatasi pada mode hanya baca (*read-only*) dengan banner peringatan dan penonaktifan seluruh input formulir serta tombol simpan.
+- [x] **Penyempurnaan Tipe Basis Data (`src/types/database.types.ts`):**
+  - Penambahan definisi skema tabel PostgreSQL `payment_settings`, `tax_settings`, dan `service_charge_settings`.
 - [x] **Pengujian & Kualitas:**
-  - 127 unit & integration tests lulus di 12 test suites (`tests/unit/phase10_reports.test.tsx` dkk).
+  - 141 unit & integration tests lulus di 13 test suites (`tests/unit/phase11_settings.test.tsx` dkk).
   - ESLint 0 errors, 0 warnings.
   - Kompilasi produksi TypeScript & Vite sukses tanpa error (Exit code 0).
 
 ---
 
 ### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 10. Seluruh acceptance criteria telah terpenuhi.
+- Tidak ada untuk Phase 11. Seluruh acceptance criteria telah terpenuhi.
 
 ---
 
 ### 3. Berkas yang Dibuat / Dimodifikasi
 
 #### Dibuat:
-- `src/services/reportService.ts`
-- `tests/unit/phase10_reports.test.tsx`
+- `src/services/settingService.ts`
+- `tests/unit/phase11_settings.test.tsx`
 
 #### Dimodifikasi:
+- `src/modules/settings/pages/SettingsPage.tsx`
 - `src/modules/reports/pages/ReportsPage.tsx`
+- `src/types/database.types.ts`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
@@ -70,18 +73,19 @@
   - `tests/unit/phase8_payments_finance.test.tsx` (20 passed)
   - `tests/unit/phase9_customers.test.tsx` (13 passed)
   - `tests/unit/phase10_reports.test.tsx` (12 passed)
-  - Total: **127 passed, 0 failed**.
+  - `tests/unit/phase11_settings.test.tsx` (14 passed)
+  - Total: **141 passed, 0 failed**.
 - **ESLint:**
   - `npm run lint` -> **0 errors, 0 warnings**.
 - **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-BTf6MbGg.js` (1,443.48 kB).
+  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-DOinx_-T.js` (1,489.54 kB).
 
 ---
 
 ### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 10.
+- Tidak ada issue tersisa pada Phase 11.
 
 ---
 
 ### 6. Next Phase
-- **PHASE 11 — Settings & System Configuration** (Pengaturan Profil Restoran, Tarif Pajak PB1 & Service Charge, Konfigurasi Pembayaran QRIS/Bank, Format Nomor Struk & Template Cetak Kasir)
+- **PHASE 12 — Audit Logs, Security & Notifications** (Pencatatan Audit Trail Operasional, Riwayat Aktivitas Pengguna, Notifikasi Pesanan & Keamanan Sistem, serta Manajemen Sesi Aman)

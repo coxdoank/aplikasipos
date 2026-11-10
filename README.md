@@ -90,6 +90,7 @@ FOODPOS/
 - **Phase 8:** Manajemen Pembayaran & Keuangan Sesi Kasir (Verifikasi Bukti Transfer Manual, Alur Refund Dual-Custody Anti-Self-Approval, Buka/Tutup Shift Kasir dengan Rekonsiliasi Kas di Laci, Pencatatan Petty Cash Masuk/Keluar, dan Dashboard Pembayaran 3 Tab).
 - **Phase 9:** Manajemen & Direktori Pelanggan (Database Profil Pelanggan Guest vs Terdaftar, Validasi Keunikan Kontak, Proteksi Penghapusan Berdasarkan Riwayat Transaksi, Metrik LTV & AOV per Pelanggan, Modal Riwayat Pesanan Lengkap, serta Navigasi Menu Pelanggan).
 - **Phase 10:** Analitik Backoffice, Laporan Penjualan & Business Insights (Filter Periode Waktu Fleksibel, 4 KPI Penjualan & Pajak PB1, Visualisasi Grafik Recharts Tren Harian & Jam Sibuk, Analisis Metode Pembayaran & Kanal POS vs Online, Tabel Top 10 Menu Terlaris, serta Ekspor Laporan CSV).
+- **Phase 11:** Pengaturan Sistem & Konfigurasi Toko (Profil Restoran & Outlet, Tarif Pajak PB1 & Service Charge dengan Simulasi Real-Time, Konfigurasi Pembayaran QRIS/Bank, Template Cetak Struk POS 58/80mm dengan Live Thermal Preview, dan Kontrol Wewenang `settings.manage`).
 
 ---
 

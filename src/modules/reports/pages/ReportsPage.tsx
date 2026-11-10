@@ -281,7 +281,7 @@ export const ReportsPage: React.FC = () => {
                   tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => [
+                  formatter={(val: number | string | (number | string)[] | undefined) => [
                     formatCurrency(typeof val === "number" ? val : Number(val) || 0),
                     "Pendapatan",
                   ]}
@@ -315,7 +315,7 @@ export const ReportsPage: React.FC = () => {
                 <XAxis dataKey="displayHour" fontSize={11} tickLine={false} />
                 <YAxis fontSize={10} tickLine={false} allowDecimals={false} />
                 <Tooltip
-                  formatter={(val: any) => [
+                  formatter={(val: number | string | (number | string)[] | undefined) => [
                     `${val || 0} pesanan`,
                     "Volume Transaksi",
                   ]}
@@ -363,7 +363,7 @@ export const ReportsPage: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(val: any) => formatCurrency(Number(val) || 0)} />
+                  <Tooltip formatter={(val: number | string | (number | string)[] | undefined) => formatCurrency(Number(val) || 0)} />
                   <Legend fontSize={11} />
                 </PieChart>
               </ResponsiveContainer>

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.12.0] - 2026-11-10
+### Phase 11 — Settings & System Configuration
+
+#### Added
+- **Service Layer Pengaturan & Konfigurasi Toko (`src/services/settingService.ts`):**
+  - Manajemen terintegrasi profil outlet (`outlets`), toko operasional (`store_settings`), metode pembayaran (`payment_settings`), pajak PB1 (`tax_settings`), biaya layanan (`service_charge_settings`), dan template cetak struk kasir.
+  - Dukungan sinkronisasi ganda: persistensi data lokal terstruktur dengan kemampuan sinkronisasi ke tabel backend Supabase.
+  - Kemampuan reset bawaan pabrik (`resetToDefaults`) untuk memulihkan konfigurasi sistem awal.
+- **Halaman Pengaturan Backoffice Terpadu (`src/modules/settings/pages/SettingsPage.tsx`):**
+  - **Tab 1: Profil Outlet & Restoran:** Konfigurasi nama brand usaha, slogan, deskripsi, alamat lengkap, kode outlet (JKT-01), kontak telepon/WhatsApp, tautan Google Maps, jam buka, estimasi waktu masak, dan sakelar penerimaan pesanan online.
+  - **Tab 2: Pajak PB1 & Service Charge:** Sakelar aktif/nonaktif pajak restoran PB1, penamaan label struk, pengaturan persentase tarif pajak, pengaturan service charge, dan simulasi kalkulasi tagihan dinamis untuk transaksi Rp 100.000 secara real-time.
+  - **Tab 3: Metode Pembayaran:** Sakelar aktivasi metode Tunai (Cash), QRIS Dinamis/Statis, Transfer Bank, dan Mesin EDC Kartu. Form konfigurasi nama merchant QRIS, URL QR Code, nomor rekening, nama bank, dan nama pemilik rekening.
+  - **Tab 4: Struk & Printer POS:** Pengaturan header struk, sub-header alamat, pesan ucapan terima kasih footer, seleksi lebar kertas printer thermal (58mm vs 80mm), sakelar rincian pajak, dan konfigurasi kredensial Wi-Fi restoran (SSID & Password).
+  - **Live Interactive Thermal Receipt Preview:** Pratinjau struk kasir thermal retro dengan efek sobekan zigzag, font monospace presisi, kalkulasi pajak/service otomatis, dan info Wi-Fi yang berubah langsung sesuai input pengguna.
+  - **Otorisasi Keamanan Granular:** Proteksi hak akses `settings.manage` (hanya Owner & Admin yang dapat menyimpan perubahan; kasir ditempatkan pada mode hanya lihat dengan banner peringatan).
+- **Pengujian Unit & Integrasi Phase 11 (`tests/unit/phase11_settings.test.tsx`):**
+  - 14 pengujian komprehensif mencakup logika CRUD service layer, navigasi tab antarmuka, pengujian simulasi pajak, pratinjau struk kasir, mekanisme reset bawaan, dan penegakan izin otorisasi kasir vs owner.
+
 ## [0.11.0] - 2026-11-10
 ### Phase 10 — Backoffice Analytics, Reports, and Business Insights
 

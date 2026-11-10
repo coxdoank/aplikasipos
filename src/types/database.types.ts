@@ -679,6 +679,99 @@ export interface Database {
           updated_at?: string;
         };
       };
+      payment_settings: {
+        Row: {
+          id: string;
+          outlet_id: string;
+          qris_image_url: string | null;
+          qris_merchant_name: string | null;
+          bank_name: string | null;
+          bank_account_number: string | null;
+          bank_account_holder: string | null;
+          is_cash_enabled: boolean;
+          is_qris_enabled: boolean;
+          is_transfer_enabled: boolean;
+          is_card_enabled: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          outlet_id: string;
+          qris_image_url?: string | null;
+          qris_merchant_name?: string | null;
+          bank_name?: string | null;
+          bank_account_number?: string | null;
+          bank_account_holder?: string | null;
+          is_cash_enabled?: boolean;
+          is_qris_enabled?: boolean;
+          is_transfer_enabled?: boolean;
+          is_card_enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          outlet_id?: string;
+          qris_image_url?: string | null;
+          qris_merchant_name?: string | null;
+          bank_name?: string | null;
+          bank_account_number?: string | null;
+          bank_account_holder?: string | null;
+          is_cash_enabled?: boolean;
+          is_qris_enabled?: boolean;
+          is_transfer_enabled?: boolean;
+          is_card_enabled?: boolean;
+          updated_at?: string;
+        };
+      };
+      tax_settings: {
+        Row: {
+          id: string;
+          outlet_id: string;
+          is_enabled: boolean;
+          tax_rate_percent: number;
+          tax_name: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          outlet_id: string;
+          is_enabled?: boolean;
+          tax_rate_percent?: number;
+          tax_name?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          outlet_id?: string;
+          is_enabled?: boolean;
+          tax_rate_percent?: number;
+          tax_name?: string;
+          updated_at?: string;
+        };
+      };
+      service_charge_settings: {
+        Row: {
+          id: string;
+          outlet_id: string;
+          is_enabled: boolean;
+          service_rate_percent: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          outlet_id: string;
+          is_enabled?: boolean;
+          service_rate_percent?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          outlet_id?: string;
+          is_enabled?: boolean;
+          service_rate_percent?: number;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       bootstrap_initial_owner: {
