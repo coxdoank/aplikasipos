@@ -7,7 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.14.0] - 2026-11-10
+## [1.0.0] - 2026-11-10
+### Phase 14 — E2E Testing, CI/CD GitHub Pages Deployment & Final System Documentation (Production Release)
+
+#### Added
+- **Suite Pengujian End-to-End (E2E) Sistem Lengkap (`tests/unit/phase14_e2e_flow.test.tsx`):**
+  - **Flow 1: Transaksi Toko Publik & Pelacakan Mandiri:** Penambahan menu hidangan ke keranjang, checkout delivery dengan kalkulasi pajak PB1 10% dan ongkos kirim, pembuatan token pelacakan 256-bit CSPRNG, serta verifikasi pelacakan publik status pesanan online.
+  - **Flow 2: Sesi Kasir & Transaksi POS:** Pembukaan shift kasir dengan modal awal laci kas Rp 200.000, transaksi langsung POS *Dine-In*, kalkulator pembayaran tunai dengan kembalian, dan pembaruan laci kasir.
+  - **Flow 3: Verifikasi Pembayaran Transfer, Dapur Kanban & Refund Dual-Custody:** Verifikasi bukti transfer bank kasir, pemajuan status pesanan otomatis ke `PROCESSING`, penyelesaian hidangan di dapur hingga `COMPLETED`, pengajuan refund oleh kasir, penegakan aturan *Anti-Self-Approval* (kasir dilarang menyetujui refund sendiri), dan persetujuan sukses oleh Owner.
+  - **Flow 4: Tutup Shift Kasir & Rekonsiliasi Analitik:** Penutupan sesi kasir dengan perhitungan selisih fisik vs sistem (*discrepancy*), pembaruan metrik agregat laporan penjualan eksekutif, dan verifikasi logging otomatis jejak audit trail.
+- **Workflow Otomasi CI/CD GitHub Actions (`.github/workflows/deploy.yml`):**
+  - Konfigurasi workflow terintegrasi pada cabang `main` dan `master`.
+  - Langkah *caching* dependensi npm untuk akselerasi eksekusi pipeline.
+  - Langkah verifikasi bertingkat: Linting ESLint 9, eksekusi 162 unit test Vitest, proses build produksi Vite, dan publikasi otomatis ke GitHub Pages.
+- **Dokumentasi Produksi Terpadu (`README.md`):**
+  - Panduan komprehensif arsitektur proyek, matriks akun demo staf simulator (Owner, Admin, Cashier) beserta hak akses RBAC.
+  - Urutan lengkap 13 berkas migrasi SQL Supabase PostgreSQL dan inisialisasi data `seed.sql`.
+  - Instruksi setup lokal dan panduan aktivasi GitHub Pages Actions.
+- **Penyempurnaan Penanganan Addons Keranjang (`src/services/storeService.ts`):**
+  - Null-safety guard pada pemetaan addons pesanan online `(i.addons || []).map(...)` untuk menjamin stabilitas saat item keranjang ditambahkan tanpa opsi varian ekstra.
+
+#### Summary
+- Seluruh 15 fase pengembangan (Phase 0 hingga Phase 14) berhasil diselesaikan 100% tanpa celah.
+- Total pengujian: **162 tests passed** di **16 test files**.
+- ESLint status: **0 errors, 0 warnings**.
+- Kompilasi build produksi Vite: **Exit code 0**.
 ### Phase 13 — Multi-Outlet Readiness & Final Polishing
 
 #### Added

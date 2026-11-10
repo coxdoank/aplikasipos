@@ -387,7 +387,7 @@ export const storeService = {
       p_items: payload.items.map((i) => ({
         product_id: i.productId,
         variant_id: i.variant?.id || null,
-        addon_ids: i.addons.map((a) => a.id),
+        addon_ids: (i.addons || []).map((a) => a.id),
         quantity: i.quantity,
         item_notes: i.itemNotes || "",
       })),
@@ -445,7 +445,7 @@ export const storeService = {
         quantity: i.quantity,
         line_total: i.unitPrice * i.quantity,
         variant: i.variant?.name,
-        addons: i.addons.map((a) => ({ name: a.name, price: a.price })),
+        addons: (i.addons || []).map((a) => ({ name: a.name, price: a.price })),
       })),
       timeline: [
         {
@@ -485,7 +485,7 @@ export const storeService = {
         product_name_snapshot: i.name,
         sku_snapshot: `SKU-${i.productId.slice(0, 4)}`,
         variant_name_snapshot: i.variant?.name || null,
-        addons_snapshot: i.addons.map((a) => ({ id: a.id, name: a.name, price: a.price })),
+        addons_snapshot: (i.addons || []).map((a) => ({ id: a.id, name: a.name, price: a.price })),
         unit_price: i.unitPrice,
         quantity: i.quantity,
         discount_amount: 0,

@@ -1,94 +1,83 @@
 # DEVELOPMENT PROGRESS — FOODPOS
 
-## Current Phase: PHASE 13 — Multi-Outlet Readiness & Final Polishing
+## Overall Project Status: 100% COMPLETED (PRODUCTION READY — v1.0.0)
 
-### Status: COMPLETED & AWAITING USER APPROVAL ("Lanjut")
+### Current Phase: PHASE 14 — E2E Testing, CI/CD GitHub Pages Deployment & Final Documentation
 
----
-
-### 1. Pekerjaan Selesai (Completed Tasks - Phase 13)
-- [x] **Service Layer Kesiapan Multi-Outlet (`src/services/outletService.ts`):**
-  - **Manajemen Cabang Restoran Terpadu:**
-    - Direktori 3 outlet awal: Outlet Pusat Senopati (`JKT-01`), Cabang Kemang Urban (`JKT-02`), dan Cabang Dago Heritage Bandung (`BDG-01`).
-    - Penyimpanan lokal berstruktur dengan kemampuan sinkronisasi otomatis ke tabel Supabase `outlets`.
-    - Mekanisme peralihan cabang aktif: `getActiveOutletId`, `setActiveOutletId`, dan `switchOutlet(id)`.
-    - Pendaftaran outlet baru (`createOutlet`) dengan validasi keunikan kode outlet (*case-insensitive*) dan pembaruan data cabang (`updateOutlet`).
-- [x] **Komponen Pemilih Outlet Backoffice (`src/components/shared/OutletSwitcher.tsx`):**
-  - **Dukungan Otorisasi Peran:**
-    - Peran `OWNER`: Dropdown interaktif di header Backoffice dengan nama cabang, kode outlet, alamat cabang, dan centang outlet yang sedang aktif.
-    - Peran `CASHIER`: Lencana statis terkunci (*locked badge*) yang menampilkan cabang penugasan tanpa izin beralih ke outlet lain.
-  - **Integrasi State Global:**
-    - Aksi `setOutlet` pada `useAuthStore` untuk pembaruan instan konteks cabang aktif di seluruh modul sistem.
-- [x] **Indikator Ketahanan Jaringan Offline/Online (`src/components/shared/NetworkStatusIndicator.tsx`):**
-  - Pemantau konektivitas real-time melalui event browser `window.addEventListener('online'/'offline')`.
-  - Floating pill status ramah pengguna:
-    - *Offline*: Peringatan "Mode Offline: Koneksi terputus. Data transaksi tersimpan aman di laci lokal." dengan ikon WifiOff dan animasi visual.
-    - *Online Restoration*: Notifikasi "Koneksi Pulih: Terhubung kembali ke sistem backend FOODPOS." dengan ikon Wifi hijau yang menghilang otomatis setelah 4 detik.
-- [x] **Komponen Tanggap Error Aplikasi (`src/components/shared/ErrorBoundary.tsx`):**
-  - React Error Boundary yang membungkus seluruh aplikasi pada `src/app/providers/index.tsx`.
-  - Layar pemulihan darurat (*recovery screen*) berbahasa Indonesia dengan rincian pesan error serta tombol pintas "Halaman Utama" dan "Muat Ulang Halaman".
-- [x] **Polishing UI/UX & Integrasi Header:**
-  - Penataan header Backoffice yang harmonis: Breadcrumb, Outlet Switcher, Pintasan Toko Publik, Buka Kasir POS, Pusat Notifikasi Lonceng, Profil Pengguna, dan Tombol Logout.
-- [x] **Pengujian & Kualitas:**
-  - 158 unit & integration tests lulus di 15 test suites (`tests/unit/phase13_multioutlet_polish.test.tsx` dkk).
-  - ESLint 0 errors, 0 warnings.
-  - Kompilasi produksi TypeScript & Vite sukses tanpa error (Exit code 0).
+### Status: COMPLETED & VERIFIED (ALL 15 PHASES FINISHED)
 
 ---
 
-### 2. Pekerjaan Belum Selesai (Incomplete Tasks)
-- Tidak ada untuk Phase 13. Seluruh acceptance criteria telah terpenuhi.
+### 1. Ringkasan Keseluruhan Fase Pengembangan (Phase 0 — Phase 14)
+
+| Fase | Deskripsi Modul & Cakupan Fitur | Status | Tests |
+| :--- | :--- | :---: | :---: |
+| **Phase 0** | Fondasi Project (React 18 + TS + Vite + Tailwind + shadcn tokens + HashRouter) | ✅ Selesai | 3 tests |
+| **Phase 1** | PostgreSQL Database Schema (28 tabel, 12 migrasi, RLS, Storage, Bootstrap) | ✅ Selesai | 5 tests |
+| **Phase 2** | Toko Publik & Pelacakan (Katalog, Keranjang Zustand, PB1, 256-bit Token CSPRNG) | ✅ Selesai | 9 tests |
+| **Phase 3** | Backoffice & Auth RBAC (Zustand Store, Demo Accounts, ProtectedRoute, 403) | ✅ Selesai | 6 tests |
+| **Phase 4** | Manajemen Pesanan & Kanban Dapur (dnd-kit, FSM Status, Web Audio Chime, Thermal Print) | ✅ Selesai | 15 tests |
+| **Phase 5** | Kasir POS (Fast Grid, Varian & Addons, Parkir Tagihan/Hold Bill, Kembalian Tunai) | ✅ Selesai | 13 tests |
+| **Phase 6** | Katalog Menu & Kategori (CRUD Kategori Auto-slug, Produk SKU unik, Availability Toggle) | ✅ Selesai | 17 tests |
+| **Phase 7** | Inventori Produk Siap Jual (Stock Movement Ledger 5 Tipe, Opname Fisik, Anti-Stok Negatif) | ✅ Selesai | 14 tests |
+| **Phase 8** | Pembayaran, Verifikasi & Keuangan Kasir (Transfer Verification, Dual-Custody Refund, Shift Kasir) | ✅ Selesai | 20 tests |
+| **Phase 9** | Manajemen Pelanggan (Direktori Pelanggan, Proteksi Hapus Riwayat, Metrik LTV/AOV) | ✅ Selesai | 13 tests |
+| **Phase 10** | Analitik Penjualan & Laporan (4 KPI, 4 Visualisasi Recharts, Peak Hours, Ekspor CSV) | ✅ Selesai | 12 tests |
+| **Phase 11** | Pengaturan Restoran & Sistem (Tarif PB1 & Simulasi Dinamis, QRIS, Live Thermal Preview) | ✅ Selesai | 14 tests |
+| **Phase 12** | Log Audit, Keamanan & Notifikasi (Sanitasi Password, CSV Audit, Lonceng Topbar, Modal JSON) | ✅ Selesai | 8 tests |
+| **Phase 13** | Multi-Outlet & UI Polish (Outlet Switcher, Ketahanan Offline/Online, React Error Boundary) | ✅ Selesai | 9 tests |
+| **Phase 14** | E2E Testing, CI/CD Pages Deployment & Dokumentasi Rilis v1.0.0 | ✅ Selesai | 4 tests |
+| **TOTAL** | **15 Fase Pengembangan Penuh** | **100% Selesai** | **162 Tests** |
 
 ---
 
-### 3. Berkas yang Dibuat / Dimodifikasi
+### 2. Pekerjaan Selesai pada Phase 14
+- [x] **Suite Pengujian End-to-End (E2E) Sistem (`tests/unit/phase14_e2e_flow.test.tsx`):**
+  - **Flow 1:** Transaksi Pemesanan Toko Publik, Perhitungan PB1 & Ongkir, Pembuatan Token 256-bit CSPRNG, dan Pelacakan Pesanan Mandiri.
+  - **Flow 2:** Pembukaan Shift Kasir Laci Kas, Transaksi Langsung POS Dine-In, Kalkulator Kembalian Tunai, dan Pembaruan Sesi Kas.
+  - **Flow 3:** Verifikasi Bukti Transfer Bank Kasir, Pemajuan Status Pesanan ke Kitchen Kanban, Alur Pengajuan Refund Kasir, Penegakan Aturan *Anti-Self-Approval* (Dual-Custody), dan Persetujuan oleh Owner.
+  - **Flow 4:** Penutupan Sesi Kasir dengan Rekonsiliasi Kas Fisik vs Sistem (*Discrepancy*), Validasi Konsistensi Metrik Laporan Penjualan Eksekutif, dan Verifikasi Logging Jejak Audit Trail.
+- [x] **Workflow Otomasi CI/CD GitHub Actions (`.github/workflows/deploy.yml`):**
+  - Trigger otomatis pada branch `main` dan `master`.
+  - Caching dependensi npm untuk performa cepat.
+  - Langkah berurutan: linting ESLint 9, eksekusi seluruh 162 unit tests, kompilasi build produksi Vite, dan publikasi ke GitHub Pages.
+- [x] **Dokumentasi Produksi Terpadu (`README.md`):**
+  - Arsitektur teknologi dan peta struktur direktori modular.
+  - Matriks akun demo staf simulator (Owner, Admin, Cashier) beserta hak akses wewenang.
+  - Panduan instalasi lokal, urutan lengkap 13 migrasi SQL Supabase + seed.sql, dan langkah rilis GitHub Pages.
+- [x] **Penyempurnaan Penanganan Addons Keranjang (`src/services/storeService.ts`):**
+  - Null-safety guard pada pemetaan addons pesanan online `(i.addons || []).map(...)`.
+- [x] **Pembaruan Riwayat Rilis & Status:**
+  - `CHANGELOG.md` versi rilis produksi `[1.0.0] - 2026-11-10`.
+  - `DEVELOPMENT_PROGRESS.md` menandai proyek selesai 100%.
+
+---
+
+### 3. Berkas yang Dibuat / Dimodifikasi pada Phase 14
 
 #### Dibuat:
-- `src/services/outletService.ts`
-- `src/components/shared/OutletSwitcher.tsx`
-- `src/components/shared/NetworkStatusIndicator.tsx`
-- `src/components/shared/ErrorBoundary.tsx`
-- `tests/unit/phase13_multioutlet_polish.test.tsx`
+- `tests/unit/phase14_e2e_flow.test.tsx`
 
 #### Dimodifikasi:
-- `src/stores/authStore.ts`
-- `src/layouts/backoffice/BackofficeLayout.tsx`
-- `src/app/providers/index.tsx`
+- `.github/workflows/deploy.yml`
+- `src/services/storeService.ts`
 - `README.md`
 - `CHANGELOG.md`
 - `DEVELOPMENT_PROGRESS.md`
 
 ---
 
-### 4. Test yang Dijalankan & Hasil Aktual
+### 4. Hasil Verifikasi Kualitas Akhir (Final QA Checklist)
 - **Vitest Unit & Integration Tests:**
-  - `tests/unit/phase0.test.tsx` (3 passed)
-  - `tests/unit/phase1_database.test.ts` (5 passed)
-  - `tests/unit/phase2_public_website.test.tsx` (5 passed)
-  - `tests/unit/phase2_ui_integration.test.tsx` (4 passed)
-  - `tests/unit/phase3_auth_backoffice.test.tsx` (6 passed)
-  - `tests/unit/phase4_orders.test.tsx` (15 passed)
-  - `tests/unit/phase5_pos.test.tsx` (13 passed)
-  - `tests/unit/phase6_catalog.test.tsx` (17 passed)
-  - `tests/unit/phase7_inventory.test.tsx` (14 passed)
-  - `tests/unit/phase8_payments_finance.test.tsx` (20 passed)
-  - `tests/unit/phase9_customers.test.tsx` (13 passed)
-  - `tests/unit/phase10_reports.test.tsx` (12 passed)
-  - `tests/unit/phase11_settings.test.tsx` (14 passed)
-  - `tests/unit/phase12_audit_security.test.tsx` (8 passed)
-  - `tests/unit/phase13_multioutlet_polish.test.tsx` (9 passed)
-  - Total: **158 passed, 0 failed**.
-- **ESLint:**
+  - 16 test files passed (16/16)
+  - 162 tests passed (162/162)
+  - Durasi: ~9.5 detik
+- **ESLint 9 (Flat Config):**
   - `npm run lint` -> **0 errors, 0 warnings**.
-- **Typecheck & Production Build:**
-  - `npm run build` -> **Exit code 0**, bundle `dist/assets/index-Djk48WUv.js` (1,532.27 kB).
+- **Kompilasi TypeScript & Vite Production Build:**
+  - `npm run build` -> **Exit code 0**, bundle `dist/` ter-generate sempurna.
 
 ---
 
-### 5. Known Issues
-- Tidak ada issue tersisa pada Phase 13.
-
----
-
-### 6. Next Phase
-- **PHASE 14 — E2E Testing, CI/CD GitHub Pages Deployment & Final Documentation** (Uji Alur E2E Transaksi Kasir & Pelacakan Publik, Konfigurasi Alur Kerja GitHub Actions CI/CD Pages, Panduan Setup Lengkap Supabase & POS, serta Serah Terima Sistem Produksi)
+### 5. Status Rilis Produksi
+Proyek FOODPOS telah mencapai versi **1.0.0** dan siap untuk di-deploy ke lingkungan produksi maupun GitHub Pages. Seluruh persyaratan teknis dan fungsional dari Phase 0 hingga Phase 14 telah dipenuhi secara menyeluruh.
